@@ -88,6 +88,13 @@ function TagsInput(props) {
   const inputElementRef = React.useRef(null);
   const [tagState, setTagState] = React.useState("");
   const [isFocusedState, setIsFocusedState] = React.useState(false);
+  React.useEfect(() => {
+    if (hasControlledInputHook() && !inputValueHook(props)) {
+
+    } else {
+      setTagState(inputValueHook(props));
+    }
+  },[props])
   const {
     value,
     onChange,
@@ -399,26 +406,6 @@ function TagsInput(props) {
     return (
       typeof onChangeInput === "function" && typeof inputValue === "string"
     );
-  };
-
-  const componentDidMount = () => {
-    if (hasControlledInputHook()) {
-      return;
-    }
-
-    setTagState(inputValueHook(props));
-  };
-
-  const componentWillReceiveProps = (nextProps) => {
-    /* istanbul ignore next */
-    if (hasControlledInputHook()) {
-      return;
-    }
-
-    if (!inputValueHook(nextProps)) {
-      return;
-    }
-    setTagState(inputValueHook(nextProps));
   };
 
   let divClassName = className;
