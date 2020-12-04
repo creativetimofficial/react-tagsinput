@@ -124,7 +124,7 @@ var defaultInputProps = {
   placeholder: "Add a tag"
 };
 
-function TagsInput(props) {
+var TagsInput = /*#__PURE__*/_react["default"].forwardRef(function (props, ref) {
   var divElementRef = _react["default"].useRef(null);
 
   var inputElementRef = _react["default"].useRef(null);
@@ -473,7 +473,7 @@ function TagsInput(props) {
     onClick: handleClickHook,
     className: divClassName
   }, renderLayout(tagComponents, inputComponent));
-}
+});
 
 TagsInput.defaultProps = {
   className: "react-tagsinput",
