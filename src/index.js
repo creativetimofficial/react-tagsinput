@@ -80,98 +80,93 @@ const defaultInputProps = {
 class TagsInput extends React.Component {
   const divElementRef = React.useRef(null);
   const inputElementRef = React.useRef(null);
-  /* istanbul ignore next */
-  constructor () {
-    super()
-    this.state = {tag: '', isFocused: false}
-    this.focus = ::this.focus
-    this.blur = ::this.blur
-  }
+  const [tagState,setTagState] = React.useState("");
+  const [isFocusedState,setIsFocusedState] = React.useState(false);
 
-  _getTagDisplayValue (tag) {
+  _getTagDisplayValueHook (tagInner) {
     const {tagDisplayProp} = this.props
 
     if (tagDisplayProp) {
-      return tag[tagDisplayProp]
+      return tagInner[tagDisplayProp]
     }
 
-    return tag
+    return tagInner
   }
 
-  _makeTag (tag) {
+  _makeTagHook (tagInner) {
     const {tagDisplayProp} = this.props
 
     if (tagDisplayProp) {
       return {
-        [tagDisplayProp]: tag
+        [tagDisplayProp]: tagInner
       }
     }
 
-    return tag
+    return tagInner
   }
 
-  _removeTag (index) {
-    let value = this.props.value.concat([])
-    if (index > -1 && index < value.length) {
-      let changed = value.splice(index, 1)
-      this.props.onChange(value, changed, [index])
+  _removeTagHook (indexInner) {
+    let valueInner = this.props.value.concat([])
+    if (indexInner > -1 && indexInner < valueInner.length) {
+      let changed = valueInner.splice(indexInner, 1)
+      this.props.onChange(valueInner, changed, [indexInner])
     }
   }
 
-  _clearInput () {
-    if (this.hasControlledInput()) {
+  _clearInputHook () {
+    if (hasControlledInputHook()) {
       this.props.onChangeInput('')
     } else {
-      this.setState({tag: ''})
+      setTagState("");
     }
   }
 
-  _tag () {
-    if (this.hasControlledInput()) {
+  _tagHook () {
+    if (hasControlledInputHook()) {
       return this.props.inputValue
     }
 
-    return this.state.tag
+    return tagState
   }
 
-  _addTags (tags) {
+  _addTagsHook (tagsInner) {
     let {onChange, onValidationReject, onlyUnique, maxTags, value} = this.props
 
     if (onlyUnique) {
-      tags = uniq(tags)
-      tags = tags.filter(tag => value.every(currentTag =>
-        this._getTagDisplayValue(currentTag) !== this._getTagDisplayValue(tag))
+      tagsInner = uniq(tagsInner)
+      tagsInner = tagsInner.filter(tag => value.every(currentTag =>
+        _getTagDisplayValueHook(currentTag) !== _getTagDisplayValueHook(tag))
       )
     }
 
-    const rejectedTags = tags.filter(tag => !this._validate(this._getTagDisplayValue(tag)))
-    tags = tags.filter(tag => this._validate(this._getTagDisplayValue(tag)))
-    tags = tags.filter(tag => {
-      let tagDisplayValue = this._getTagDisplayValue(tag)
-      if (typeof tagDisplayValue.trim === 'function') {
-        return tagDisplayValue.trim().length > 0
+    const rejectedTags = tagsInner.filter(tag => !_validateHook(_getTagDisplayValueHook(tag)))
+    tagsInner = tagsInner.filter(tag => _validateHook(_getTagDisplayValueHook(tag)))
+    tagsInner = tagsInner.filter(tag => {
+      let tagDisplayValueInner = _getTagDisplayValueHook(tag)
+      if (typeof tagDisplayValueInner.trim === 'function') {
+        return tagDisplayValueInner.trim().length > 0
       } else {
-        return tagDisplayValue
+        return tagDisplayValueInner
       }
     })
 
     if (maxTags >= 0) {
-      let remainingLimit = Math.max(maxTags - value.length, 0)
-      tags = tags.slice(0, remainingLimit)
+      let remainingLimitInner = Math.max(maxTags - value.length, 0)
+      tagsInner = tagsInner.slice(0, remainingLimitInner)
     }
 
     if (onValidationReject && rejectedTags.length > 0) {
       onValidationReject(rejectedTags)
     }
 
-    if (tags.length > 0) {
-      let newValue = value.concat(tags)
-      let indexes = []
-      for (let i = 0; i < tags.length; i++) {
-        indexes.push(value.length + i)
+    if (tagsInner.length > 0) {
+      let newValueInner = value.concat(tagsInner)
+      let indexesInner = []
+      for (let i = 0; i < tagsInner.length; i++) {
+        indexesInner.push(value.length + i)
       }
-      onChange(newValue, tags, indexes)
-      this._clearInput()
+      onChange(newValueInner, tagsInner, indexesInner)
+      _clearInputHook()
       return true
     }
 
@@ -179,64 +174,64 @@ class TagsInput extends React.Component {
       return false
     }
 
-    this._clearInput()
+    _clearInputHook()
     return false
   }
 
-  _validate (tag) {
+  _validateHook (tagInner) {
     let {validate, validationRegex} = this.props
 
-    return validate(tag) && validationRegex.test(tag)
+    return validate(tagInner) && validationRegex.test(tagInner)
   }
 
-  _shouldPreventDefaultEventOnAdd (added, empty, keyCode) {
-    if (added) {
+  _shouldPreventDefaultEventOnAddHook (addedInner, emptyInner, keyCodeInner) {
+    if (addedInner) {
       return true
     }
 
-    if (keyCode === 13) {
-      return (this.props.preventSubmit || !this.props.preventSubmit && !empty)
+    if (keyCodeInner === 13) {
+      return (this.props.preventSubmit || !this.props.preventSubmit && !emptyInner)
     }
 
     return false
   }
 
-  focus () {
+  focusHook () {
     if (inputElementRef.current && typeof inputElementRef.current.focus === 'function') {
       inputElementRef.current.focus()
     }
 
-    this.handleOnFocus()
+    handleOnFocusHook()
   }
 
-  blur () {
+  blurHook () {
     if (inputElementRef.current && typeof inputElementRef.current.blur === 'function') {
       inputElementRef.current.blur()
     }
 
-    this.handleOnBlur()
+    handleOnBlurHook()
   }
 
-  accept () {
-    let tag = this._tag()
+  acceptHook () {
+    let tagInner = _tagHook()
 
-    if (tag !== '') {
-      tag = this._makeTag(tag)
-      return this._addTags([tag])
+    if (tagInner !== '') {
+      tagInner = _makeTagHook(tagInner)
+      return _addTagsHook([tagInner])
     }
 
     return false
   }
 
-  addTag (tag) {
-    return this._addTags([tag])
+  addTagHook (tagInner) {
+    return _addTagsHook([tagInner])
   }
 
-  clearInput () {
-    this._clearInput()
+  clearInputHook () {
+    _clearInputHook()
   }
 
-  handlePaste (e) {
+  handlePasteHook (e) {
     let {addOnPaste, pasteSplit} = this.props
 
     if (!addOnPaste) {
@@ -245,74 +240,74 @@ class TagsInput extends React.Component {
 
     e.preventDefault()
 
-    let data = getClipboardData(e)
-    let tags = pasteSplit(data).map(tag => this._makeTag(tag))
+    let dataInner = getClipboardData(e)
+    let tagsInner = pasteSplit(dataInner).map(tagInner => _makeTagHook(tagInner))
 
-    this._addTags(tags)
+    _addTagsHook(tagsInner)
   }
 
-  handleKeyDown (e) {
+  handleKeyDownHook (e) {
     if (e.defaultPrevented) {
       return
     }
 
     let {value, removeKeys, addKeys} = this.props
-    const tag = this._tag()
-    let empty = tag === ''
-    let keyCode = e.keyCode
-    let key = e.key
-    let add = addKeys.indexOf(keyCode) !== -1 || addKeys.indexOf(key) !== -1
-    let remove = removeKeys.indexOf(keyCode) !== -1 || removeKeys.indexOf(key) !== -1
+    const tagInner = _tagHook()
+    let emptyInner = tagInner === ''
+    let keyCodeInner = e.keyCode
+    let keyInner = e.key
+    let addInner = addKeys.indexOf(keyCodeInner) !== -1 || addKeys.indexOf(keyInner) !== -1
+    let removeInner = removeKeys.indexOf(keyCodeInner) !== -1 || removeKeys.indexOf(keyInner) !== -1
 
-    if (add) {
-      let added = this.accept()
-      if (this._shouldPreventDefaultEventOnAdd(added, empty, keyCode)) {
+    if (addInner) {
+      let addedInner = acceptHook()
+      if (_shouldPreventDefaultEventOnAddHook(addedInner, emptyInner, keyCodeInner)) {
         e.preventDefault()
       }
     }
 
-    if (remove && value.length > 0 && empty) {
+    if (removeInner && value.length > 0 && emptyInner) {
       e.preventDefault()
-      this._removeTag(value.length - 1)
+      _removeTagHook(value.length - 1)
     }
   }
 
-  handleClick (e) {
+  handleClickHook (e) {
     if (e.target === divElementRef.current) {
-      this.focus()
+      focusHook()
     }
   }
 
-  handleChange (e) {
+  handleChangeHook (e) {
     let {onChangeInput} = this.props
     let {onChange} = this.props.inputProps
-    let tag = e.target.value
+    let tagInner = e.target.value
 
     if (onChange) {
       onChange(e)
     }
 
-    if (this.hasControlledInput()) {
-      onChangeInput(tag)
+    if (hasControlledInputHook()) {
+      onChangeInput(tagInner)
     } else {
-      this.setState({tag})
+      setTagState(tagInner);
     }
   }
 
-  handleOnFocus (e) {
+  handleOnFocusHook (e) {
     let {onFocus} = this.props.inputProps
 
     if (onFocus) {
       onFocus(e)
     }
 
-    this.setState({isFocused: true})
+    setIsFocusedState(true);
   }
 
-  handleOnBlur (e) {
+  handleOnBlurHook (e) {
     let {onBlur} = this.props.inputProps
 
-    this.setState({isFocused: false})
+    setIsFocusedState(false);
 
     if (e == null) {
       return
@@ -323,16 +318,16 @@ class TagsInput extends React.Component {
     }
 
     if (this.props.addOnBlur) {
-      const tag = this._makeTag(e.target.value)
-      this._addTags([tag])
+      const tagInner = _makeTagHook(e.target.value)
+      _addTagsHook([tagInner])
     }
   }
 
-  handleRemove (tag) {
-    this._removeTag(tag)
+  handleRemoveHook (tagInner) {
+    _removeTagHook(tagInner)
   }
 
-  inputProps () {
+  inputPropsHook () {
     // eslint-disable-next-line
     let {onChange, onFocus, onBlur, ...otherInputProps} = this.props.inputProps
 
@@ -348,39 +343,34 @@ class TagsInput extends React.Component {
     return props
   }
 
-  inputValue (props) {
-    return props.currentValue || props.inputValue || ''
+  inputValueHook (propsInner) {
+    return propsInner.currentValue || propsInner.inputValue || ''
   }
 
-  hasControlledInput () {
+  hasControlledInputHook () {
     const {inputValue, onChangeInput} = this.props
 
     return typeof onChangeInput === 'function' && typeof inputValue === 'string'
   }
 
   componentDidMount () {
-    if (this.hasControlledInput()) {
+    if (hasControlledInputHook()) {
       return
     }
 
-    this.setState({
-      tag: this.inputValue(this.props)
-    })
+    setTagState(inputValueHook(this.props))
   }
 
   componentWillReceiveProps (nextProps) {
     /* istanbul ignore next */
-    if (this.hasControlledInput()) {
+    if (hasControlledInputHook()) {
       return
     }
 
-    if (!this.inputValue(nextProps)) {
+    if (!inputValueHook(nextProps)) {
       return
     }
-
-    this.setState({
-      tag: this.inputValue(nextProps)
-    })
+    setTagState(inputValueHook(nextProps))
   }
 
   render () {
@@ -411,38 +401,36 @@ class TagsInput extends React.Component {
       ...other
     } = this.props
     /* eslint-enable */
-
-    let {isFocused} = this.state
-
-    if (isFocused) {
-      className += ' ' + focusedClassName
+    let divClassName = className;
+    if (isFocusedState) {
+      divClassName = className + ' ' + focusedClassName
     }
 
     let tagComponents = value.map((tag, index) => {
       return renderTag({
         key: index,
         tag,
-        onRemove: ::this.handleRemove,
+        onRemove: handleRemoveHook,
         disabled,
-        getTagDisplayValue: ::this._getTagDisplayValue,
+        getTagDisplayValue: _getTagDisplayValueHook,
         ...tagProps
       })
     })
 
     let inputComponent = renderInput({
       ref: inputElementRef,
-      value: this._tag(),
-      onPaste: ::this.handlePaste,
-      onKeyDown: ::this.handleKeyDown,
-      onChange: ::this.handleChange,
-      onFocus: ::this.handleOnFocus,
-      onBlur: ::this.handleOnBlur,
-      addTag: ::this.addTag,
-      ...this.inputProps()
+      value: _tagHook(),
+      onPaste: handlePasteHook,
+      onKeyDown: handleKeyDownHook,
+      onChange: handleChangeHook,
+      onFocus: handleOnFocusHook,
+      onBlur: handleOnBlurHook,
+      addTag: addTagHook,
+      ...inputPropsHook()
     })
 
     return (
-      <div ref={divElementRef} onClick={::this.handleClick} className={className}>
+      <div ref={divElementRef} onClick={handleClickHook} className={divClassName}>
         {renderLayout(tagComponents, inputComponent)}
       </div>
     )
