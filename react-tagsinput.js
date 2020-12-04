@@ -139,7 +139,7 @@ function TagsInput(props) {
       isFocusedState = _React$useState4[0],
       setIsFocusedState = _React$useState4[1];
 
-  _react["default"].useEfect(function () {
+  _react["default"].useEffect(function () {
     if (hasControlledInputHook() && !inputValueHook(props)) {} else {
       setTagState(inputValueHook(props));
     }
