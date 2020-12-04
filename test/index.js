@@ -1,5 +1,7 @@
 const jsdom = require("jsdom");
-global.document = jsdom.jsdom("");
+const { JSDOM } = jsdom;
+const dom = new JSDOM("");
+global.document = dom.window.document;
 global.window = document.defaultView;
 global.navigator = window.navigator;
 
