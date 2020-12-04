@@ -90,11 +90,10 @@ function TagsInput(props) {
   const [isFocusedState, setIsFocusedState] = React.useState(false);
   React.useEfect(() => {
     if (hasControlledInputHook() && !inputValueHook(props)) {
-
     } else {
       setTagState(inputValueHook(props));
     }
-  },[props])
+  }, [props]);
   const {
     value,
     onChange,
