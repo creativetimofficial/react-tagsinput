@@ -1,43 +1,55 @@
 {
-  "name": "@creativetimofficial/react-tagsinput",
+  "name": "react-tagsinput",
   "version": "3.19.0",
   "description": "Highly customizable React component for inputing tags",
   "main": "react-tagsinput.js",
   "peerDependencies": {
-    "react": "17.0.1"
+    "react": "^17.0.1"
   },
   "devDependencies": {
     "@babel/cli": "7.12.8",
     "@babel/core": "7.12.9",
-    "@babel/eslint-parser": "7.12.1",
+    "@babel/plugin-proposal-class-properties": "7.12.1",
+    "@babel/plugin-proposal-decorators": "7.12.1",
+    "@babel/plugin-proposal-do-expressions": "7.12.1",
+    "@babel/plugin-proposal-export-default-from": "7.12.1",
+    "@babel/plugin-proposal-export-namespace-from": "7.12.1",
+    "@babel/plugin-proposal-function-bind": "7.12.1",
+    "@babel/plugin-proposal-function-sent": "7.12.1",
+    "@babel/plugin-proposal-json-strings": "7.12.1",
+    "@babel/plugin-proposal-logical-assignment-operators": "7.12.1",
+    "@babel/plugin-proposal-nullish-coalescing-operator": "7.12.1",
+    "@babel/plugin-proposal-numeric-separator": "7.12.7",
+    "@babel/plugin-proposal-optional-chaining": "7.12.7",
+    "@babel/plugin-proposal-pipeline-operator": "7.12.1",
+    "@babel/plugin-proposal-throw-expressions": "7.12.1",
+    "@babel/plugin-syntax-dynamic-import": "7.8.3",
+    "@babel/plugin-syntax-import-meta": "7.10.4",
     "@babel/plugin-transform-modules-umd": "7.12.1",
     "@babel/preset-env": "7.12.7",
     "@babel/preset-react": "7.12.7",
     "@babel/register": "7.12.1",
-    "eslint": "7.14.0",
+    "babel-eslint": "10.1.0",
+    "babel-plugin-add-module-exports": "1.0.4",
+    "babel-plugin-transform-react-remove-prop-types": "0.4.24",
     "istanbul": "1.1.0-alpha.1",
     "jsdom": "16.4.0",
     "mocha": "8.2.1",
     "prop-types": "15.7.2",
-    "react": "17.0.1",
-    "react-autosuggest": "10.0.4",
-    "react-dom": "17.0.1",
-    "react-input-autosize": "2.2.2",
-    "reactpack": "0.9.0",
     "sinon": "9.2.1",
     "standard": "16.0.3"
   },
   "scripts": {
-    "test": "standard src/index.js && mocha --compilers js:babel-register",
+    "test": "standard src/index.js && mocha --compilers js:@babel/register",
     "build": "babel --module-id ReactTagsInput -m umd src/index.js > react-tagsinput.js",
     "build-example": "reactpack --no-extract --no-source-map --no-html example/index.js example/",
     "build-example-watch": "reactpack -w --no-extract --no-source-map --no-html example/index.js example/",
-    "coverage": "istanbul cover --report text --report html _mocha -- --compilers js:babel-register",
+    "coverage": "istanbul cover --report text --report html _mocha -- --compilers js:@babel/register",
     "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/creativetimofficial/react-tagsinput"
+    "url": "https://github.com/olahol/react-tagsinput"
   },
   "keywords": [
     "react",
@@ -50,10 +62,7 @@
   "author": "Ola Holmström",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/creativetimofficial/react-tagsinput/issues"
+    "url": "https://github.com/olahol/react-tagsinput/issues"
   },
-  "standard": {
-    "parser": "@babel/eslint-parser"
-  },
-  "homepage": "https://github.com/creativetimofficial/react-tagsinput"
+  "homepage": "https://github.com/olahol/react-tagsinput"
 }
