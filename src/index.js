@@ -315,8 +315,9 @@ function TagsInput(tagsInputProps){
   const hasControlledInput = () => {
     return typeof onChangeInput === 'function' && typeof inputValue === 'string'
   }
+  let newClassName = className;
   if (isFocused) {
-    className += ' ' + focusedClassName
+    newClassName += ' ' + focusedClassName
   }
   let tagComponents = value.map((tag, index) => {
     return renderTag({
@@ -340,7 +341,7 @@ function TagsInput(tagsInputProps){
     ...this.inputPropsFunc()
   })
   return (
-    <div ref={r => { this.div = r }} onClick={::this.handleClick} className={className}>
+    <div ref={r => { this.div = r }} onClick={::this.handleClick} className={newClassName}>
       {renderLayout(tagComponents, inputComponent)}
     </div>
   )
