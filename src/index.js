@@ -77,14 +77,37 @@ const defaultInputProps = {
   placeholder: 'Add a tag'
 }
 
-class TagsInput extends React.Component {
+function TagsInput(props){
   const divElementRef = React.useRef(null);
   const inputElementRef = React.useRef(null);
   const [tagState,setTagState] = React.useState("");
   const [isFocusedState,setIsFocusedState] = React.useState(false);
-
+  const {
+    value,
+    onChange,
+    tagProps,
+    renderLayout,
+    renderTag,
+    renderInput,
+    addKeys,
+    removeKeys,
+    className,
+    focusedClassName,
+    addOnBlur,
+    addOnPaste,
+    inputProps,
+    pasteSplit,
+    onlyUnique,
+    maxTags,
+    validate,
+    validationRegex,
+    disabled,
+    tagDisplayProp,
+    inputValue,
+    onChangeInput,
+    ...other
+  } = props;
   _getTagDisplayValueHook (tagInner) {
-    const {tagDisplayProp} = this.props
 
     if (tagDisplayProp) {
       return tagInner[tagDisplayProp]
@@ -94,7 +117,6 @@ class TagsInput extends React.Component {
   }
 
   _makeTagHook (tagInner) {
-    const {tagDisplayProp} = this.props
 
     if (tagDisplayProp) {
       return {
@@ -106,16 +128,16 @@ class TagsInput extends React.Component {
   }
 
   _removeTagHook (indexInner) {
-    let valueInner = this.props.value.concat([])
+    let valueInner = value.concat([])
     if (indexInner > -1 && indexInner < valueInner.length) {
       let changed = valueInner.splice(indexInner, 1)
-      this.props.onChange(valueInner, changed, [indexInner])
+      onChange(valueInner, changed, [indexInner])
     }
   }
 
   _clearInputHook () {
     if (hasControlledInputHook()) {
-      this.props.onChangeInput('')
+      onChangeInput('')
     } else {
       setTagState("");
     }
@@ -123,14 +145,14 @@ class TagsInput extends React.Component {
 
   _tagHook () {
     if (hasControlledInputHook()) {
-      return this.props.inputValue
+      return inputValue
     }
 
     return tagState
   }
 
   _addTagsHook (tagsInner) {
-    let {onChange, onValidationReject, onlyUnique, maxTags, value} = this.props
+    let {onValidationReject} = props
 
     if (onlyUnique) {
       tagsInner = uniq(tagsInner)
@@ -179,7 +201,6 @@ class TagsInput extends React.Component {
   }
 
   _validateHook (tagInner) {
-    let {validate, validationRegex} = this.props
 
     return validate(tagInner) && validationRegex.test(tagInner)
   }
@@ -190,7 +211,7 @@ class TagsInput extends React.Component {
     }
 
     if (keyCodeInner === 13) {
-      return (this.props.preventSubmit || !this.props.preventSubmit && !emptyInner)
+      return (props.preventSubmit || !props.preventSubmit && !emptyInner)
     }
 
     return false
@@ -232,7 +253,6 @@ class TagsInput extends React.Component {
   }
 
   handlePasteHook (e) {
-    let {addOnPaste, pasteSplit} = this.props
 
     if (!addOnPaste) {
       return
@@ -251,7 +271,6 @@ class TagsInput extends React.Component {
       return
     }
 
-    let {value, removeKeys, addKeys} = this.props
     const tagInner = _tagHook()
     let emptyInner = tagInner === ''
     let keyCodeInner = e.keyCode
@@ -279,8 +298,7 @@ class TagsInput extends React.Component {
   }
 
   handleChangeHook (e) {
-    let {onChangeInput} = this.props
-    let {onChange} = this.props.inputProps
+    let {onChange} = props.inputProps
     let tagInner = e.target.value
 
     if (onChange) {
@@ -295,7 +313,7 @@ class TagsInput extends React.Component {
   }
 
   handleOnFocusHook (e) {
-    let {onFocus} = this.props.inputProps
+    let {onFocus} = props.inputProps
 
     if (onFocus) {
       onFocus(e)
@@ -305,7 +323,7 @@ class TagsInput extends React.Component {
   }
 
   handleOnBlurHook (e) {
-    let {onBlur} = this.props.inputProps
+    let {onBlur} = props.inputProps
 
     setIsFocusedState(false);
 
@@ -317,7 +335,7 @@ class TagsInput extends React.Component {
       onBlur(e)
     }
 
-    if (this.props.addOnBlur) {
+    if (addOnBlur) {
       const tagInner = _makeTagHook(e.target.value)
       _addTagsHook([tagInner])
     }
@@ -329,18 +347,18 @@ class TagsInput extends React.Component {
 
   inputPropsHook () {
     // eslint-disable-next-line
-    let {onChange, onFocus, onBlur, ...otherInputProps} = this.props.inputProps
+    let {onChange, onFocus, onBlur, ...otherInputProps} = props.inputProps
 
-    let props = {
+    let propsInner = {
       ...defaultInputProps,
       ...otherInputProps
     }
 
-    if (this.props.disabled) {
-      props.disabled = true
+    if (disabled) {
+      propsInner.disabled = true
     }
 
-    return props
+    return propsInner
   }
 
   inputValueHook (propsInner) {
@@ -348,8 +366,6 @@ class TagsInput extends React.Component {
   }
 
   hasControlledInputHook () {
-    const {inputValue, onChangeInput} = this.props
-
     return typeof onChangeInput === 'function' && typeof inputValue === 'string'
   }
 
@@ -358,7 +374,7 @@ class TagsInput extends React.Component {
       return
     }
 
-    setTagState(inputValueHook(this.props))
+    setTagState(inputValueHook(props))
   }
 
   componentWillReceiveProps (nextProps) {
@@ -374,33 +390,6 @@ class TagsInput extends React.Component {
   }
 
   render () {
-    /* eslint-disable */
-    let {
-      value,
-      onChange,
-      tagProps,
-      renderLayout,
-      renderTag,
-      renderInput,
-      addKeys,
-      removeKeys,
-      className,
-      focusedClassName,
-      addOnBlur,
-      addOnPaste,
-      inputProps,
-      pasteSplit,
-      onlyUnique,
-      maxTags,
-      validate,
-      validationRegex,
-      disabled,
-      tagDisplayProp,
-      inputValue,
-      onChangeInput,
-      ...other
-    } = this.props
-    /* eslint-enable */
     let divClassName = className;
     if (isFocusedState) {
       divClassName = className + ' ' + focusedClassName
