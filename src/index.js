@@ -389,7 +389,6 @@ function TagsInput(props){
     setTagState(inputValueHook(nextProps))
   }
 
-  render () {
     let divClassName = className;
     if (isFocusedState) {
       divClassName = className + ' ' + focusedClassName
@@ -424,7 +423,6 @@ function TagsInput(props){
       </div>
     )
   }
-}
 
 
 TagsInput.defaultProps = {
