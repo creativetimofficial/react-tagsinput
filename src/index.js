@@ -86,60 +86,6 @@ class TagsInput extends React.Component {
     this.blur = ::this.blur
   }
 
-  static propTypes = {
-    focusedClassName: PropTypes.string,
-    addKeys: PropTypes.arrayOf(PropTypes.oneOfType([
-      PropTypes.number,
-      PropTypes.string
-    ])),
-    addOnBlur: PropTypes.bool,
-    addOnPaste: PropTypes.bool,
-    currentValue: PropTypes.string,
-    inputValue: PropTypes.string,
-    inputProps: PropTypes.object,
-    onChange: PropTypes.func.isRequired,
-    onChangeInput: PropTypes.func,
-    removeKeys: PropTypes.arrayOf(PropTypes.oneOfType([
-      PropTypes.number,
-      PropTypes.string
-    ])),
-    renderInput: PropTypes.func,
-    renderTag: PropTypes.func,
-    renderLayout: PropTypes.func,
-    pasteSplit: PropTypes.func,
-    tagProps: PropTypes.object,
-    onlyUnique: PropTypes.bool,
-    value: PropTypes.array.isRequired,
-    maxTags: PropTypes.number,
-    validate: PropTypes.func,
-    validationRegex: PropTypes.instanceOf(RegExp),
-    disabled: PropTypes.bool,
-    tagDisplayProp: PropTypes.string,
-    preventSubmit: PropTypes.bool
-  }
-
-  static defaultProps = {
-    className: 'react-tagsinput',
-    focusedClassName: 'react-tagsinput--focused',
-    addKeys: [9, 13],
-    addOnBlur: false,
-    addOnPaste: false,
-    inputProps: {},
-    removeKeys: [8],
-    renderInput: defaultRenderInput,
-    renderTag: defaultRenderTag,
-    renderLayout: defaultRenderLayout,
-    pasteSplit: defaultPasteSplit,
-    tagProps: {className: 'react-tagsinput-tag', classNameRemove: 'react-tagsinput-remove'},
-    onlyUnique: false,
-    maxTags: -1,
-    validate: () => true,
-    validationRegex: /.*/,
-    disabled: false,
-    tagDisplayProp: null,
-    preventSubmit: true
-  }
-
   _getTagDisplayValue (tag) {
     const {tagDisplayProp} = this.props
 
@@ -500,5 +446,61 @@ class TagsInput extends React.Component {
     )
   }
 }
+
+
+TagsInput.defaultProps = {
+  className: 'react-tagsinput',
+  focusedClassName: 'react-tagsinput--focused',
+  addKeys: [9, 13],
+  addOnBlur: false,
+  addOnPaste: false,
+  inputProps: {},
+  removeKeys: [8],
+  renderInput: defaultRenderInput,
+  renderTag: defaultRenderTag,
+  renderLayout: defaultRenderLayout,
+  pasteSplit: defaultPasteSplit,
+  tagProps: {className: 'react-tagsinput-tag', classNameRemove: 'react-tagsinput-remove'},
+  onlyUnique: false,
+  maxTags: -1,
+  validate: () => true,
+  validationRegex: /.*/,
+  disabled: false,
+  tagDisplayProp: null,
+  preventSubmit: true
+}
+
+TagsInput.propTypes = {
+  focusedClassName: PropTypes.string,
+  addKeys: PropTypes.arrayOf(PropTypes.oneOfType([
+    PropTypes.number,
+    PropTypes.string
+  ])),
+  addOnBlur: PropTypes.bool,
+  addOnPaste: PropTypes.bool,
+  currentValue: PropTypes.string,
+  inputValue: PropTypes.string,
+  inputProps: PropTypes.object,
+  onChange: PropTypes.func.isRequired,
+  onChangeInput: PropTypes.func,
+  removeKeys: PropTypes.arrayOf(PropTypes.oneOfType([
+    PropTypes.number,
+    PropTypes.string
+  ])),
+  renderInput: PropTypes.func,
+  renderTag: PropTypes.func,
+  renderLayout: PropTypes.func,
+  pasteSplit: PropTypes.func,
+  tagProps: PropTypes.object,
+  onlyUnique: PropTypes.bool,
+  value: PropTypes.array.isRequired,
+  maxTags: PropTypes.number,
+  validate: PropTypes.func,
+  validationRegex: PropTypes.instanceOf(RegExp),
+  disabled: PropTypes.bool,
+  tagDisplayProp: PropTypes.string,
+  preventSubmit: PropTypes.bool
+}
+
 
 export default TagsInput
