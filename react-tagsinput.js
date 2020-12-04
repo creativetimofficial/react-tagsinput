@@ -125,7 +125,7 @@ var defaultInputProps = {
 };
 
 var TagsInput = /*#__PURE__*/_react["default"].forwardRef(function (props, ref) {
-  var divElementRef = _react["default"].useRef(null);
+  var divElementRef = ref ? ref : _react["default"].useRef(null);
 
   var inputElementRef = _react["default"].useRef(null);
 
