@@ -617,6 +617,6 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
   var _default = TagsInput;
   _exports["default"] = _default;
-  module.exports = exports["default"];
+  module.exports = exports.default;
 });
 
