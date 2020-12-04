@@ -107,6 +107,8 @@ function TagsInput(tagsInputProps){
   ] = tagsInputProps;
   const[tagState,setTagState] = React.useState("");
   const[isFocusedState,setIsFocusedState] = React.useState(false);
+  const divElementRef = React.useRef(null);
+  const inputElementRef = React.useRef(null);
   React.useEffect(() => {
     if (hasControlledInput()) {
       return;
@@ -201,14 +203,14 @@ function TagsInput(tagsInputProps){
     return false
   }
   const focus = () => {
-    if (this.input && typeof this.input.focus === 'function') {
-      this.input.focus()
+    if (inputElementRef.current && typeof inputElementRef.current.focus === 'function') {
+      inputElementRef.current.focus()
     }
     handleOnFocus()
   }
   const blur = () => {
-    if (this.input && typeof this.input.blur === 'function') {
-      this.input.blur()
+    if (inputElementRef.current && typeof inputElementRef.current.blur === 'function') {
+      inputElementRef.current.blur()
     }
     handleOnBlur()
   }
@@ -257,7 +259,7 @@ function TagsInput(tagsInputProps){
     }
   }
   const handleClick = (e) => {
-    if (e.target === this.div) {
+    if (e.target === divElementRef.current) {
       focus()
     }
   }
@@ -323,25 +325,25 @@ function TagsInput(tagsInputProps){
     return renderTag({
       key: index,
       tag,
-      onRemove: ::this.handleRemove,
+      onRemove: handleRemove,
       disabled,
-      getTagDisplayValue: ::this._getTagDisplayValue,
+      getTagDisplayValue: _getTagDisplayValue,
       ...tagProps
     })
   })
   let inputComponent = renderInput({
-    ref: r => { this.input = r },
-    value: this._tag(),
-    onPaste: ::this.handlePaste,
-    onKeyDown: ::this.handleKeyDown,
-    onChange: ::this.handleChange,
-    onFocus: ::this.handleOnFocus,
-    onBlur: ::this.handleOnBlur,
-    addTag: ::this.addTag,
-    ...this.inputPropsFunc()
+    ref: inputElementRef,
+    value: _tag(),
+    onPaste: handlePaste,
+    onKeyDown: handleKeyDown,
+    onChange: handleChange,
+    onFocus: handleOnFocus,
+    onBlur: handleOnBlur,
+    addTag: addTag,
+    ...inputPropsFunc()
   })
   return (
-    <div ref={r => { this.div = r }} onClick={::this.handleClick} className={newClassName}>
+    <div ref={divElementRef} onClick={handleClick} className={newClassName}>
       {renderLayout(tagComponents, inputComponent)}
     </div>
   )
