@@ -369,7 +369,7 @@ function TagsInput(props){
     return typeof onChangeInput === 'function' && typeof inputValue === 'string'
   }
 
-  componentDidMount () {
+  const componentDidMount = () => {
     if (hasControlledInputHook()) {
       return
     }
@@ -377,7 +377,7 @@ function TagsInput(props){
     setTagState(inputValueHook(props))
   }
 
-  componentWillReceiveProps (nextProps) {
+  const componentWillReceiveProps =  (nextProps) =>  {
     /* istanbul ignore next */
     if (hasControlledInputHook()) {
       return
