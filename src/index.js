@@ -83,7 +83,7 @@ const defaultInputProps = {
   placeholder: "Add a tag",
 };
 
-function TagsInput = React.forwardRef((props, ref) => {
+const TagsInput = React.forwardRef((props, ref) => {
   const divElementRef = React.useRef(null);
   const inputElementRef = React.useRef(null);
   const [tagState, setTagState] = React.useState("");
