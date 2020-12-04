@@ -84,7 +84,7 @@ const defaultInputProps = {
 };
 
 const TagsInput = React.forwardRef((props, ref) => {
-  const divElementRef = React.useRef(null);
+  const divElementRef = ref ? ref:React.useRef(null);
   const inputElementRef = React.useRef(null);
   const [tagState, setTagState] = React.useState("");
   const [isFocusedState, setIsFocusedState] = React.useState(false);
