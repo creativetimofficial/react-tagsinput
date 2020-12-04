@@ -83,7 +83,7 @@ const defaultInputProps = {
   placeholder: "Add a tag",
 };
 
-function TagsInput(props) {
+function TagsInput = React.forwardRef((props, ref) => {
   const divElementRef = React.useRef(null);
   const inputElementRef = React.useRef(null);
   const [tagState, setTagState] = React.useState("");
@@ -440,7 +440,7 @@ function TagsInput(props) {
       {renderLayout(tagComponents, inputComponent)}
     </div>
   );
-}
+});
 
 TagsInput.defaultProps = {
   className: "react-tagsinput",
