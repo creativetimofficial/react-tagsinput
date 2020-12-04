@@ -107,7 +107,7 @@ function TagsInput(props){
     onChangeInput,
     ...other
   } = props;
-  _getTagDisplayValueHook (tagInner) {
+  const _getTagDisplayValueHook = (tagInner) => {
 
     if (tagDisplayProp) {
       return tagInner[tagDisplayProp]
@@ -116,7 +116,7 @@ function TagsInput(props){
     return tagInner
   }
 
-  _makeTagHook (tagInner) {
+  const _makeTagHook =  (tagInner)  => {
 
     if (tagDisplayProp) {
       return {
@@ -127,7 +127,7 @@ function TagsInput(props){
     return tagInner
   }
 
-  _removeTagHook (indexInner) {
+  const _removeTagHook =  (indexInner)  => {
     let valueInner = value.concat([])
     if (indexInner > -1 && indexInner < valueInner.length) {
       let changed = valueInner.splice(indexInner, 1)
@@ -135,7 +135,7 @@ function TagsInput(props){
     }
   }
 
-  _clearInputHook () {
+  const _clearInputHook =  () =>  {
     if (hasControlledInputHook()) {
       onChangeInput('')
     } else {
@@ -143,7 +143,7 @@ function TagsInput(props){
     }
   }
 
-  _tagHook () {
+  const _tagHook  = ()  => {
     if (hasControlledInputHook()) {
       return inputValue
     }
@@ -151,7 +151,7 @@ function TagsInput(props){
     return tagState
   }
 
-  _addTagsHook (tagsInner) {
+  const _addTagsHook =  (tagsInner) =>  {
     let {onValidationReject} = props
 
     if (onlyUnique) {
@@ -200,12 +200,12 @@ function TagsInput(props){
     return false
   }
 
-  _validateHook (tagInner) {
+  const _validateHook  = (tagInner) =>  {
 
     return validate(tagInner) && validationRegex.test(tagInner)
   }
 
-  _shouldPreventDefaultEventOnAddHook (addedInner, emptyInner, keyCodeInner) {
+  const _shouldPreventDefaultEventOnAddHook  = (addedInner, emptyInner, keyCodeInner)  => {
     if (addedInner) {
       return true
     }
@@ -217,7 +217,7 @@ function TagsInput(props){
     return false
   }
 
-  focusHook () {
+  const focusHook =  () =>  {
     if (inputElementRef.current && typeof inputElementRef.current.focus === 'function') {
       inputElementRef.current.focus()
     }
@@ -225,7 +225,7 @@ function TagsInput(props){
     handleOnFocusHook()
   }
 
-  blurHook () {
+  const blurHook =  () =>  {
     if (inputElementRef.current && typeof inputElementRef.current.blur === 'function') {
       inputElementRef.current.blur()
     }
@@ -233,7 +233,7 @@ function TagsInput(props){
     handleOnBlurHook()
   }
 
-  acceptHook () {
+  const acceptHook  = ()  => {
     let tagInner = _tagHook()
 
     if (tagInner !== '') {
@@ -244,15 +244,15 @@ function TagsInput(props){
     return false
   }
 
-  addTagHook (tagInner) {
+  const addTagHook =  (tagInner)  => {
     return _addTagsHook([tagInner])
   }
 
-  clearInputHook () {
+  const clearInputHook =  () =>  {
     _clearInputHook()
   }
 
-  handlePasteHook (e) {
+  const handlePasteHook  = (e) =>  {
 
     if (!addOnPaste) {
       return
@@ -266,7 +266,7 @@ function TagsInput(props){
     _addTagsHook(tagsInner)
   }
 
-  handleKeyDownHook (e) {
+  const handleKeyDownHook =  (e)  => {
     if (e.defaultPrevented) {
       return
     }
@@ -291,13 +291,13 @@ function TagsInput(props){
     }
   }
 
-  handleClickHook (e) {
+  const handleClickHook =  (e)  => {
     if (e.target === divElementRef.current) {
       focusHook()
     }
   }
 
-  handleChangeHook (e) {
+  const handleChangeHook =  (e)  => {
     let {onChange} = props.inputProps
     let tagInner = e.target.value
 
@@ -312,7 +312,7 @@ function TagsInput(props){
     }
   }
 
-  handleOnFocusHook (e) {
+  const handleOnFocusHook =  (e)  => {
     let {onFocus} = props.inputProps
 
     if (onFocus) {
@@ -322,7 +322,7 @@ function TagsInput(props){
     setIsFocusedState(true);
   }
 
-  handleOnBlurHook (e) {
+  const handleOnBlurHook =  (e)  => {
     let {onBlur} = props.inputProps
 
     setIsFocusedState(false);
@@ -341,11 +341,11 @@ function TagsInput(props){
     }
   }
 
-  handleRemoveHook (tagInner) {
+  const handleRemoveHook =  (tagInner)  => {
     _removeTagHook(tagInner)
   }
 
-  inputPropsHook () {
+  const inputPropsHook  = ()  => {
     // eslint-disable-next-line
     let {onChange, onFocus, onBlur, ...otherInputProps} = props.inputProps
 
@@ -361,11 +361,11 @@ function TagsInput(props){
     return propsInner
   }
 
-  inputValueHook (propsInner) {
+  const inputValueHook =  (propsInner)  => {
     return propsInner.currentValue || propsInner.inputValue || ''
   }
 
-  hasControlledInputHook () {
+  const hasControlledInputHook =  () => {
     return typeof onChangeInput === 'function' && typeof inputValue === 'string'
   }
 
