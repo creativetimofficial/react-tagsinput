@@ -88,7 +88,7 @@ function TagsInput(props) {
   const inputElementRef = React.useRef(null);
   const [tagState, setTagState] = React.useState("");
   const [isFocusedState, setIsFocusedState] = React.useState(false);
-  React.useEfect(() => {
+  React.useEffect(() => {
     if (hasControlledInputHook() && !inputValueHook(props)) {
     } else {
       setTagState(inputValueHook(props));
