@@ -77,35 +77,43 @@ const defaultInputProps = {
   placeholder: 'Add a tag'
 }
 
-function TagsInput({
-  value,
-  onChange,
-  tagProps,
-  renderLayout,
-  renderTag,
-  renderInput,
-  addKeys,
-  removeKeys,
-  className,
-  focusedClassName,
-  addOnBlur,
-  addOnPaste,
-  inputProps,
-  pasteSplit,
-  onlyUnique,
-  maxTags,
-  validate,
-  validationRegex,
-  disabled,
-  tagDisplayProp,
-  inputValue,
-  onChangeInput,
-  onValidationReject,
-  preventSubmit,
-  ...other
-}){
+function TagsInput(tagsInputProps){
+  const [
+    value,
+    onChange,
+    tagProps,
+    renderLayout,
+    renderTag,
+    renderInput,
+    addKeys,
+    removeKeys,
+    className,
+    focusedClassName,
+    addOnBlur,
+    addOnPaste,
+    inputProps,
+    pasteSplit,
+    onlyUnique,
+    maxTags,
+    validate,
+    validationRegex,
+    disabled,
+    tagDisplayProp,
+    inputValue,
+    onChangeInput,
+    onValidationReject,
+    preventSubmit,
+    ...other
+  ] = tagsInputProps;
   const[tagState,setTagState] = React.useState("");
   const[isFocusedState,setIsFocusedState] = React.useState(false);
+  React.useEffect(() => {
+    if (hasControlledInput()) {
+      return;
+    } else {
+      setTagState(inputValueFunction(tagsInputProps))
+    }
+  },[])
   const _getTagDisplayValue = (tag) => {
     if (tagDisplayProp) {
       return tag[tagDisplayProp]
@@ -301,7 +309,7 @@ function TagsInput({
     }
     return props
   }
-  const inputValue = (props) => {
+  const inputValueFunction = (props) => {
     return props.currentValue || props.inputValue || ''
   }
   const hasControlledInput = () => {
@@ -338,7 +346,7 @@ function TagsInput({
   )
 }
 
-const TagsInput.defaultProps = {
+TagsInput.defaultProps = {
   className: 'react-tagsinput',
   focusedClassName: 'react-tagsinput--focused',
   addKeys: [9, 13],
@@ -360,7 +368,7 @@ const TagsInput.defaultProps = {
   preventSubmit: true
 }
 
-const TagsInput.propTypes = {
+TagsInput.propTypes = {
   focusedClassName: PropTypes.string,
   addKeys: PropTypes.arrayOf(PropTypes.oneOfType([
     PropTypes.number,
@@ -391,32 +399,3 @@ const TagsInput.propTypes = {
   tagDisplayProp: PropTypes.string,
   preventSubmit: PropTypes.bool
 }
-
-class TagsInput extends React.Component {
-componentDidMount () {
-    if (this.hasControlledInput()) {
-      return
-    }
-
-    this.setState({
-      tag: this.inputValue(this.props)
-    })
-  }
-
-  componentWillReceiveProps (nextProps) {
-    /* istanbul ignore next */
-    if (this.hasControlledInput()) {
-      return
-    }
-
-    if (!this.inputValue(nextProps)) {
-      return
-    }
-
-    this.setState({
-      tag: this.inputValue(nextProps)
-    })
-  }
-}
-
-export default TagsInput
