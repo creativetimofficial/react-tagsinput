@@ -22,11 +22,11 @@
     "standard": "16.0.3"
   },
   "scripts": {
-    "test": "standard src/index.js && mocha --require js:@babel/register",
+    "test": "standard src/index.js && mocha --require @babel/register",
     "build": "babel --module-id ReactTagsInput src/index.js > react-tagsinput.js",
     "build-example": "reactpack --no-extract --no-source-map --no-html example/index.js example/",
     "build-example-watch": "reactpack -w --no-extract --no-source-map --no-html example/index.js example/",
-    "coverage": "istanbul cover --report text --report html _mocha -- --require js:@babel/register",
+    "coverage": "istanbul cover --report text --report html _mocha -- --require @babel/register",
     "prepare": "npm run build"
   },
   "repository": {
