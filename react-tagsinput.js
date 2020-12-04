@@ -122,8 +122,6 @@
   };
 
   function TagsInput(tagsInputProps) {
-    var _this = this;
-
     var _tagsInputProps = _toArray(tagsInputProps),
         value = _tagsInputProps[0],
         onChange = _tagsInputProps[1],
@@ -160,6 +158,10 @@
         _React$useState4 = _slicedToArray(_React$useState3, 2),
         isFocusedState = _React$useState4[0],
         setIsFocusedState = _React$useState4[1];
+
+    var divElementRef = _react["default"].useRef(null);
+
+    var inputElementRef = _react["default"].useRef(null);
 
     _react["default"].useEffect(function () {
       if (hasControlledInput()) {
@@ -286,16 +288,16 @@
     };
 
     var focus = function focus() {
-      if (_this.input && typeof _this.input.focus === 'function') {
-        _this.input.focus();
+      if (inputElementRef.current && typeof inputElementRef.current.focus === 'function') {
+        inputElementRef.current.focus();
       }
 
       handleOnFocus();
     };
 
     var blur = function blur() {
-      if (_this.input && typeof _this.input.blur === 'function') {
-        _this.input.blur();
+      if (inputElementRef.current && typeof inputElementRef.current.blur === 'function') {
+        inputElementRef.current.blur();
       }
 
       handleOnBlur();
@@ -363,7 +365,7 @@
     };
 
     var handleClick = function handleClick(e) {
-      if (e.target === _this.div) {
+      if (e.target === divElementRef.current) {
         focus();
       }
     };
@@ -450,28 +452,24 @@
       return renderTag(_objectSpread({
         key: index,
         tag: tag,
-        onRemove: _this.handleRemove.bind(_this),
+        onRemove: handleRemove,
         disabled: disabled,
-        getTagDisplayValue: _this._getTagDisplayValue.bind(_this)
+        getTagDisplayValue: _getTagDisplayValue
       }, tagProps));
     });
     var inputComponent = renderInput(_objectSpread({
-      ref: function ref(r) {
-        _this.input = r;
-      },
-      value: this._tag(),
-      onPaste: this.handlePaste.bind(this),
-      onKeyDown: this.handleKeyDown.bind(this),
-      onChange: this.handleChange.bind(this),
-      onFocus: this.handleOnFocus.bind(this),
-      onBlur: this.handleOnBlur.bind(this),
-      addTag: this.addTag.bind(this)
-    }, this.inputPropsFunc()));
+      ref: inputElementRef,
+      value: _tag(),
+      onPaste: handlePaste,
+      onKeyDown: handleKeyDown,
+      onChange: handleChange,
+      onFocus: handleOnFocus,
+      onBlur: handleOnBlur,
+      addTag: addTag
+    }, inputPropsFunc()));
     return /*#__PURE__*/_react["default"].createElement("div", {
-      ref: function ref(r) {
-        _this.div = r;
-      },
-      onClick: this.handleClick.bind(this),
+      ref: divElementRef,
+      onClick: handleClick,
       className: newClassName
     }, renderLayout(tagComponents, inputComponent));
   }
