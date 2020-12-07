@@ -701,7 +701,7 @@ describe("TagsInput", () => {
       let comp = TestUtils.renderIntoDocument(
         <TestComponent disabled={true} />
       );
-      assert.ok(comp.tagsinput().input.disabled, "input should be disabled");
+      assert.ok(comp.input().disabled, "input should be disabled");
     });
 
     describe("preventSubmit", () => {
