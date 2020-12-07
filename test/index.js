@@ -810,7 +810,7 @@ describe("TagsInput", () => {
       change(comp, "test");
       comp.tagsinput().clearInput();
       assert.equal(
-        comp.tagsinput().state.tag,
+        comp.tagsinput()._getTagState,
         "",
         "there should be no tag value"
       );
