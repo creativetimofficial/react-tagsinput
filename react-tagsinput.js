@@ -1,662 +1,531 @@
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define('ReactTagsInput', ['module', 'exports', 'react', 'prop-types'], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(module, exports, require('react'), require('prop-types'));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod, mod.exports, global.React, global.propTypes);
-    global.ReactTagsInput = mod.exports;
-  }
-})(this, function (module, exports, _react, _propTypes) {
-  'use strict';
+"use strict";
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  var _react2 = _interopRequireDefault(_react);
-
-  var _propTypes2 = _interopRequireDefault(_propTypes);
-
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-      default: obj
-    };
-  }
-
-  function _defineProperty(obj, key, value) {
-    if (key in obj) {
-      Object.defineProperty(obj, key, {
-        value: value,
-        enumerable: true,
-        configurable: true,
-        writable: true
-      });
-    } else {
-      obj[key] = value;
-    }
-
-    return obj;
-  }
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var _createClass = function () {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-
-    return function (Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  }();
-
-  function _possibleConstructorReturn(self, call) {
-    if (!self) {
-      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-    }
-
-    return call && (typeof call === "object" || typeof call === "function") ? call : self;
-  }
-
-  function _inherits(subClass, superClass) {
-    if (typeof superClass !== "function" && superClass !== null) {
-      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-    }
-
-    subClass.prototype = Object.create(superClass && superClass.prototype, {
-      constructor: {
-        value: subClass,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }
-    });
-    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-  }
-
-  var _extends = Object.assign || function (target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-
-    return target;
-  };
-
-  function _objectWithoutProperties(obj, keys) {
-    var target = {};
-
-    for (var i in obj) {
-      if (keys.indexOf(i) >= 0) continue;
-      if (!Object.prototype.hasOwnProperty.call(obj, i)) continue;
-      target[i] = obj[i];
-    }
-
-    return target;
-  }
-
-  function uniq(arr) {
-    var out = [];
-
-    for (var i = 0; i < arr.length; i++) {
-      if (out.indexOf(arr[i]) === -1) {
-        out.push(arr[i]);
-      }
-    }
-
-    return out;
-  }
-
-  /* istanbul ignore next */
-  function getClipboardData(e) {
-    if (window.clipboardData) {
-      return window.clipboardData.getData('Text');
-    }
-
-    if (e.clipboardData) {
-      return e.clipboardData.getData('text/plain');
-    }
-
-    return '';
-  }
-
-  function defaultRenderTag(props) {
-    var tag = props.tag,
-        key = props.key,
-        disabled = props.disabled,
-        onRemove = props.onRemove,
-        classNameRemove = props.classNameRemove,
-        getTagDisplayValue = props.getTagDisplayValue,
-        other = _objectWithoutProperties(props, ['tag', 'key', 'disabled', 'onRemove', 'classNameRemove', 'getTagDisplayValue']);
-
-    return _react2.default.createElement(
-      'span',
-      _extends({ key: key }, other),
-      getTagDisplayValue(tag),
-      !disabled && _react2.default.createElement('a', { className: classNameRemove, onClick: function onClick(e) {
-          return onRemove(key);
-        } })
-    );
-  }
-
-  function defaultRenderInput(_ref) {
-    var addTag = _ref.addTag,
-        props = _objectWithoutProperties(_ref, ['addTag']);
-
-    var onChange = props.onChange,
-        value = props.value,
-        other = _objectWithoutProperties(props, ['onChange', 'value']);
-
-    return _react2.default.createElement('input', _extends({ type: 'text', onChange: onChange, value: value }, other));
-  }
-
-  function defaultRenderLayout(tagComponents, inputComponent) {
-    return _react2.default.createElement(
-      'span',
-      null,
-      tagComponents,
-      inputComponent
-    );
-  }
-
-  function defaultPasteSplit(data) {
-    return data.split(' ').map(function (d) {
-      return d.trim();
-    });
-  }
-
-  var defaultInputProps = {
-    className: 'react-tagsinput-input',
-    placeholder: 'Add a tag'
-  };
-
-  var TagsInput = function (_React$Component) {
-    _inherits(TagsInput, _React$Component);
-
-    /* istanbul ignore next */
-    function TagsInput() {
-      _classCallCheck(this, TagsInput);
-
-      var _this = _possibleConstructorReturn(this, (TagsInput.__proto__ || Object.getPrototypeOf(TagsInput)).call(this));
-
-      _this.state = { tag: '', isFocused: false };
-      _this.focus = _this.focus.bind(_this);
-      _this.blur = _this.blur.bind(_this);
-      return _this;
-    }
-
-    _createClass(TagsInput, [{
-      key: '_getTagDisplayValue',
-      value: function _getTagDisplayValue(tag) {
-        var tagDisplayProp = this.props.tagDisplayProp;
-
-
-        if (tagDisplayProp) {
-          return tag[tagDisplayProp];
-        }
-
-        return tag;
-      }
-    }, {
-      key: '_makeTag',
-      value: function _makeTag(tag) {
-        var tagDisplayProp = this.props.tagDisplayProp;
-
-
-        if (tagDisplayProp) {
-          return _defineProperty({}, tagDisplayProp, tag);
-        }
-
-        return tag;
-      }
-    }, {
-      key: '_removeTag',
-      value: function _removeTag(index) {
-        var value = this.props.value.concat([]);
-        if (index > -1 && index < value.length) {
-          var changed = value.splice(index, 1);
-          this.props.onChange(value, changed, [index]);
-        }
-      }
-    }, {
-      key: '_clearInput',
-      value: function _clearInput() {
-        if (this.hasControlledInput()) {
-          this.props.onChangeInput('');
-        } else {
-          this.setState({ tag: '' });
-        }
-      }
-    }, {
-      key: '_tag',
-      value: function _tag() {
-        if (this.hasControlledInput()) {
-          return this.props.inputValue;
-        }
-
-        return this.state.tag;
-      }
-    }, {
-      key: '_addTags',
-      value: function _addTags(tags) {
-        var _this2 = this;
-
-        var _props = this.props,
-            onChange = _props.onChange,
-            onValidationReject = _props.onValidationReject,
-            onlyUnique = _props.onlyUnique,
-            maxTags = _props.maxTags,
-            value = _props.value;
-
-
-        if (onlyUnique) {
-          tags = uniq(tags);
-          tags = tags.filter(function (tag) {
-            return value.every(function (currentTag) {
-              return _this2._getTagDisplayValue(currentTag) !== _this2._getTagDisplayValue(tag);
-            });
-          });
-        }
-
-        var rejectedTags = tags.filter(function (tag) {
-          return !_this2._validate(_this2._getTagDisplayValue(tag));
-        });
-        tags = tags.filter(function (tag) {
-          return _this2._validate(_this2._getTagDisplayValue(tag));
-        });
-        tags = tags.filter(function (tag) {
-          var tagDisplayValue = _this2._getTagDisplayValue(tag);
-          if (typeof tagDisplayValue.trim === 'function') {
-            return tagDisplayValue.trim().length > 0;
-          } else {
-            return tagDisplayValue;
-          }
-        });
-
-        if (maxTags >= 0) {
-          var remainingLimit = Math.max(maxTags - value.length, 0);
-          tags = tags.slice(0, remainingLimit);
-        }
-
-        if (onValidationReject && rejectedTags.length > 0) {
-          onValidationReject(rejectedTags);
-        }
-
-        if (tags.length > 0) {
-          var newValue = value.concat(tags);
-          var indexes = [];
-          for (var i = 0; i < tags.length; i++) {
-            indexes.push(value.length + i);
-          }
-          onChange(newValue, tags, indexes);
-          this._clearInput();
-          return true;
-        }
-
-        if (rejectedTags.length > 0) {
-          return false;
-        }
-
-        this._clearInput();
-        return false;
-      }
-    }, {
-      key: '_validate',
-      value: function _validate(tag) {
-        var _props2 = this.props,
-            validate = _props2.validate,
-            validationRegex = _props2.validationRegex;
-
-
-        return validate(tag) && validationRegex.test(tag);
-      }
-    }, {
-      key: '_shouldPreventDefaultEventOnAdd',
-      value: function _shouldPreventDefaultEventOnAdd(added, empty, keyCode) {
-        if (added) {
-          return true;
-        }
-
-        if (keyCode === 13) {
-          return this.props.preventSubmit || !this.props.preventSubmit && !empty;
-        }
-
-        return false;
-      }
-    }, {
-      key: 'focus',
-      value: function focus() {
-        if (this.input && typeof this.input.focus === 'function') {
-          this.input.focus();
-        }
-
-        this.handleOnFocus();
-      }
-    }, {
-      key: 'blur',
-      value: function blur() {
-        if (this.input && typeof this.input.blur === 'function') {
-          this.input.blur();
-        }
-
-        this.handleOnBlur();
-      }
-    }, {
-      key: 'accept',
-      value: function accept() {
-        var tag = this._tag();
-
-        if (tag !== '') {
-          tag = this._makeTag(tag);
-          return this._addTags([tag]);
-        }
-
-        return false;
-      }
-    }, {
-      key: 'addTag',
-      value: function addTag(tag) {
-        return this._addTags([tag]);
-      }
-    }, {
-      key: 'clearInput',
-      value: function clearInput() {
-        this._clearInput();
-      }
-    }, {
-      key: 'handlePaste',
-      value: function handlePaste(e) {
-        var _this3 = this;
-
-        var _props3 = this.props,
-            addOnPaste = _props3.addOnPaste,
-            pasteSplit = _props3.pasteSplit;
-
-
-        if (!addOnPaste) {
-          return;
-        }
-
-        e.preventDefault();
-
-        var data = getClipboardData(e);
-        var tags = pasteSplit(data).map(function (tag) {
-          return _this3._makeTag(tag);
-        });
-
-        this._addTags(tags);
-      }
-    }, {
-      key: 'handleKeyDown',
-      value: function handleKeyDown(e) {
-        if (e.defaultPrevented) {
-          return;
-        }
-
-        var _props4 = this.props,
-            value = _props4.value,
-            removeKeys = _props4.removeKeys,
-            addKeys = _props4.addKeys;
-
-        var tag = this._tag();
-        var empty = tag === '';
-        var keyCode = e.keyCode;
-        var key = e.key;
-        var add = addKeys.indexOf(keyCode) !== -1 || addKeys.indexOf(key) !== -1;
-        var remove = removeKeys.indexOf(keyCode) !== -1 || removeKeys.indexOf(key) !== -1;
-
-        if (add) {
-          var added = this.accept();
-          if (this._shouldPreventDefaultEventOnAdd(added, empty, keyCode)) {
-            e.preventDefault();
-          }
-        }
-
-        if (remove && value.length > 0 && empty) {
-          e.preventDefault();
-          this._removeTag(value.length - 1);
-        }
-      }
-    }, {
-      key: 'handleClick',
-      value: function handleClick(e) {
-        if (e.target === this.div) {
-          this.focus();
-        }
-      }
-    }, {
-      key: 'handleChange',
-      value: function handleChange(e) {
-        var onChangeInput = this.props.onChangeInput;
-        var onChange = this.props.inputProps.onChange;
-
-        var tag = e.target.value;
-
-        if (onChange) {
-          onChange(e);
-        }
-
-        if (this.hasControlledInput()) {
-          onChangeInput(tag);
-        } else {
-          this.setState({ tag: tag });
-        }
-      }
-    }, {
-      key: 'handleOnFocus',
-      value: function handleOnFocus(e) {
-        var onFocus = this.props.inputProps.onFocus;
-
-
-        if (onFocus) {
-          onFocus(e);
-        }
-
-        this.setState({ isFocused: true });
-      }
-    }, {
-      key: 'handleOnBlur',
-      value: function handleOnBlur(e) {
-        var onBlur = this.props.inputProps.onBlur;
-
-
-        this.setState({ isFocused: false });
-
-        if (e == null) {
-          return;
-        }
-
-        if (onBlur) {
-          onBlur(e);
-        }
-
-        if (this.props.addOnBlur) {
-          var tag = this._makeTag(e.target.value);
-          this._addTags([tag]);
-        }
-      }
-    }, {
-      key: 'handleRemove',
-      value: function handleRemove(tag) {
-        this._removeTag(tag);
-      }
-    }, {
-      key: 'inputProps',
-      value: function inputProps() {
-        var _props$inputProps = this.props.inputProps,
-            onChange = _props$inputProps.onChange,
-            onFocus = _props$inputProps.onFocus,
-            onBlur = _props$inputProps.onBlur,
-            otherInputProps = _objectWithoutProperties(_props$inputProps, ['onChange', 'onFocus', 'onBlur']);
-
-        var props = _extends({}, defaultInputProps, otherInputProps);
-
-        if (this.props.disabled) {
-          props.disabled = true;
-        }
-
-        return props;
-      }
-    }, {
-      key: 'inputValue',
-      value: function inputValue(props) {
-        return props.currentValue || props.inputValue || '';
-      }
-    }, {
-      key: 'hasControlledInput',
-      value: function hasControlledInput() {
-        var _props5 = this.props,
-            inputValue = _props5.inputValue,
-            onChangeInput = _props5.onChangeInput;
-
-
-        return typeof onChangeInput === 'function' && typeof inputValue === 'string';
-      }
-    }, {
-      key: 'componentDidMount',
-      value: function componentDidMount() {
-        if (this.hasControlledInput()) {
-          return;
-        }
-
-        this.setState({
-          tag: this.inputValue(this.props)
-        });
-      }
-    }, {
-      key: 'componentWillReceiveProps',
-      value: function componentWillReceiveProps(nextProps) {
-        /* istanbul ignore next */
-        if (this.hasControlledInput()) {
-          return;
-        }
-
-        if (!this.inputValue(nextProps)) {
-          return;
-        }
-
-        this.setState({
-          tag: this.inputValue(nextProps)
-        });
-      }
-    }, {
-      key: 'render',
-      value: function render() {
-        var _this4 = this;
-
-        var _props6 = this.props,
-            value = _props6.value,
-            onChange = _props6.onChange,
-            tagProps = _props6.tagProps,
-            renderLayout = _props6.renderLayout,
-            renderTag = _props6.renderTag,
-            renderInput = _props6.renderInput,
-            addKeys = _props6.addKeys,
-            removeKeys = _props6.removeKeys,
-            className = _props6.className,
-            focusedClassName = _props6.focusedClassName,
-            addOnBlur = _props6.addOnBlur,
-            addOnPaste = _props6.addOnPaste,
-            inputProps = _props6.inputProps,
-            pasteSplit = _props6.pasteSplit,
-            onlyUnique = _props6.onlyUnique,
-            maxTags = _props6.maxTags,
-            validate = _props6.validate,
-            validationRegex = _props6.validationRegex,
-            disabled = _props6.disabled,
-            tagDisplayProp = _props6.tagDisplayProp,
-            inputValue = _props6.inputValue,
-            onChangeInput = _props6.onChangeInput,
-            other = _objectWithoutProperties(_props6, ['value', 'onChange', 'tagProps', 'renderLayout', 'renderTag', 'renderInput', 'addKeys', 'removeKeys', 'className', 'focusedClassName', 'addOnBlur', 'addOnPaste', 'inputProps', 'pasteSplit', 'onlyUnique', 'maxTags', 'validate', 'validationRegex', 'disabled', 'tagDisplayProp', 'inputValue', 'onChangeInput']);
-
-        var isFocused = this.state.isFocused;
-
-
-        if (isFocused) {
-          className += ' ' + focusedClassName;
-        }
-
-        var tagComponents = value.map(function (tag, index) {
-          return renderTag(_extends({
-            key: index,
-            tag: tag,
-            onRemove: _this4.handleRemove.bind(_this4),
-            disabled: disabled,
-            getTagDisplayValue: _this4._getTagDisplayValue.bind(_this4)
-          }, tagProps));
-        });
-
-        var inputComponent = renderInput(_extends({
-          ref: function ref(r) {
-            _this4.input = r;
-          },
-          value: this._tag(),
-          onPaste: this.handlePaste.bind(this),
-          onKeyDown: this.handleKeyDown.bind(this),
-          onChange: this.handleChange.bind(this),
-          onFocus: this.handleOnFocus.bind(this),
-          onBlur: this.handleOnBlur.bind(this),
-          addTag: this.addTag.bind(this)
-        }, this.inputProps()));
-
-        return _react2.default.createElement(
-          'div',
-          { ref: function ref(r) {
-              _this4.div = r;
-            }, onClick: this.handleClick.bind(this), className: className },
-          renderLayout(tagComponents, inputComponent)
-        );
-      }
-    }]);
-
-    return TagsInput;
-  }(_react2.default.Component);
-
-  TagsInput.defaultProps = {
-    className: 'react-tagsinput',
-    focusedClassName: 'react-tagsinput--focused',
-    addKeys: [9, 13],
-    addOnBlur: false,
-    addOnPaste: false,
-    inputProps: {},
-    removeKeys: [8],
-    renderInput: defaultRenderInput,
-    renderTag: defaultRenderTag,
-    renderLayout: defaultRenderLayout,
-    pasteSplit: defaultPasteSplit,
-    tagProps: { className: 'react-tagsinput-tag', classNameRemove: 'react-tagsinput-remove' },
-    onlyUnique: false,
-    maxTags: -1,
-    validate: function validate() {
-      return true;
-    },
-    validationRegex: /.*/,
-    disabled: false,
-    tagDisplayProp: null,
-    preventSubmit: true
-  };
-  exports.default = TagsInput;
-  module.exports = exports['default'];
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+exports["default"] = void 0;
+
+var _react = _interopRequireDefault(require("react"));
+
+var _propTypes = _interopRequireDefault(require("prop-types"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
+function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
+
+function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
+
+function uniq(arr) {
+  var out = [];
+
+  for (var i = 0; i < arr.length; i++) {
+    if (out.indexOf(arr[i]) === -1) {
+      out.push(arr[i]);
+    }
+  }
+
+  return out;
+}
+/* istanbul ignore next */
+
+
+function getClipboardData(e) {
+  if (window.clipboardData) {
+    return window.clipboardData.getData("Text");
+  }
+
+  if (e.clipboardData) {
+    return e.clipboardData.getData("text/plain");
+  }
+
+  return "";
+}
+
+function defaultRenderTag(props) {
+  var tag = props.tag,
+      key = props.key,
+      disabled = props.disabled,
+      onRemove = props.onRemove,
+      classNameRemove = props.classNameRemove,
+      getTagDisplayValue = props.getTagDisplayValue,
+      other = _objectWithoutProperties(props, ["tag", "key", "disabled", "onRemove", "classNameRemove", "getTagDisplayValue"]);
+
+  return /*#__PURE__*/_react["default"].createElement("span", _extends({
+    key: key
+  }, other), getTagDisplayValue(tag), !disabled && /*#__PURE__*/_react["default"].createElement("a", {
+    className: classNameRemove,
+    onClick: function onClick(e) {
+      return onRemove(key);
+    }
+  }));
+}
+
+defaultRenderTag.propTypes = {
+  key: _propTypes["default"].number,
+  tag: _propTypes["default"].string,
+  onRemove: _propTypes["default"].func,
+  classNameRemove: _propTypes["default"].string,
+  getTagDisplayValue: _propTypes["default"].func
+};
+
+function defaultRenderInput(_ref) {
+  var addTag = _ref.addTag,
+      props = _objectWithoutProperties(_ref, ["addTag"]);
+
+  var onChange = props.onChange,
+      value = props.value,
+      other = _objectWithoutProperties(props, ["onChange", "value"]);
+
+  return /*#__PURE__*/_react["default"].createElement("input", _extends({
+    type: "text",
+    onChange: onChange,
+    value: value
+  }, other));
+}
+
+defaultRenderInput.propTypes = {
+  value: _propTypes["default"].string,
+  onChange: _propTypes["default"].func,
+  addTag: _propTypes["default"].func
+};
+
+function defaultRenderLayout(tagComponents, inputComponent) {
+  return /*#__PURE__*/_react["default"].createElement("span", null, tagComponents, inputComponent);
+}
+
+function defaultPasteSplit(data) {
+  return data.split(" ").map(function (d) {
+    return d.trim();
+  });
+}
+
+var defaultInputProps = {
+  className: "react-tagsinput-input",
+  placeholder: "Add a tag"
+};
+
+var TagsInput = /*#__PURE__*/_react["default"].forwardRef(function (props, ref) {
+  var divElementRef = ref ? ref : _react["default"].useRef(null);
+
+  var inputElementRef = _react["default"].useRef(null);
+
+  var _React$useState = _react["default"].useState(""),
+      _React$useState2 = _slicedToArray(_React$useState, 2),
+      tagState = _React$useState2[0],
+      setTagState = _React$useState2[1];
+
+  var _React$useState3 = _react["default"].useState(false),
+      _React$useState4 = _slicedToArray(_React$useState3, 2),
+      isFocusedState = _React$useState4[0],
+      setIsFocusedState = _React$useState4[1];
+
+  _react["default"].useEffect(function () {
+    if (hasControlledInputHook() && !inputValueHook(props)) {} else {
+      setTagState(inputValueHook(props));
+    }
+  }, [props]);
+
+  var value = props.value,
+      onChange = props.onChange,
+      tagProps = props.tagProps,
+      renderLayout = props.renderLayout,
+      renderTag = props.renderTag,
+      renderInput = props.renderInput,
+      addKeys = props.addKeys,
+      removeKeys = props.removeKeys,
+      className = props.className,
+      focusedClassName = props.focusedClassName,
+      addOnBlur = props.addOnBlur,
+      addOnPaste = props.addOnPaste,
+      inputProps = props.inputProps,
+      pasteSplit = props.pasteSplit,
+      onlyUnique = props.onlyUnique,
+      maxTags = props.maxTags,
+      validate = props.validate,
+      validationRegex = props.validationRegex,
+      disabled = props.disabled,
+      tagDisplayProp = props.tagDisplayProp,
+      inputValue = props.inputValue,
+      onChangeInput = props.onChangeInput,
+      other = _objectWithoutProperties(props, ["value", "onChange", "tagProps", "renderLayout", "renderTag", "renderInput", "addKeys", "removeKeys", "className", "focusedClassName", "addOnBlur", "addOnPaste", "inputProps", "pasteSplit", "onlyUnique", "maxTags", "validate", "validationRegex", "disabled", "tagDisplayProp", "inputValue", "onChangeInput"]);
+
+  var _getTagDisplayValueHook = function _getTagDisplayValueHook(tagInner) {
+    if (tagDisplayProp) {
+      return tagInner[tagDisplayProp];
+    }
+
+    return tagInner;
+  };
+
+  var _makeTagHook = function _makeTagHook(tagInner) {
+    if (tagDisplayProp) {
+      return _defineProperty({}, tagDisplayProp, tagInner);
+    }
+
+    return tagInner;
+  };
+
+  var _removeTagHook = function _removeTagHook(indexInner) {
+    var valueInner = value.concat([]);
+
+    if (indexInner > -1 && indexInner < valueInner.length) {
+      var changed = valueInner.splice(indexInner, 1);
+      onChange(valueInner, changed, [indexInner]);
+    }
+  };
+
+  var _clearInputHook = function _clearInputHook() {
+    if (hasControlledInputHook()) {
+      onChangeInput("");
+    } else {
+      setTagState("");
+    }
+  };
+
+  var _tagHook = function _tagHook() {
+    if (hasControlledInputHook()) {
+      return inputValue;
+    }
+
+    return tagState;
+  };
+
+  var _addTagsHook = function _addTagsHook(tagsInner) {
+    var onValidationReject = props.onValidationReject;
+
+    if (onlyUnique) {
+      tagsInner = uniq(tagsInner);
+      tagsInner = tagsInner.filter(function (tag) {
+        return value.every(function (currentTag) {
+          return _getTagDisplayValueHook(currentTag) !== _getTagDisplayValueHook(tag);
+        });
+      });
+    }
+
+    var rejectedTags = tagsInner.filter(function (tag) {
+      return !_validateHook(_getTagDisplayValueHook(tag));
+    });
+    tagsInner = tagsInner.filter(function (tag) {
+      return _validateHook(_getTagDisplayValueHook(tag));
+    });
+    tagsInner = tagsInner.filter(function (tag) {
+      var tagDisplayValueInner = _getTagDisplayValueHook(tag);
+
+      if (typeof tagDisplayValueInner.trim === "function") {
+        return tagDisplayValueInner.trim().length > 0;
+      } else {
+        return tagDisplayValueInner;
+      }
+    });
+
+    if (maxTags >= 0) {
+      var remainingLimitInner = Math.max(maxTags - value.length, 0);
+      tagsInner = tagsInner.slice(0, remainingLimitInner);
+    }
+
+    if (onValidationReject && rejectedTags.length > 0) {
+      onValidationReject(rejectedTags);
+    }
+
+    if (tagsInner.length > 0) {
+      var newValueInner = value.concat(tagsInner);
+      var indexesInner = [];
+
+      for (var i = 0; i < tagsInner.length; i++) {
+        indexesInner.push(value.length + i);
+      }
+
+      onChange(newValueInner, tagsInner, indexesInner);
+
+      _clearInputHook();
+
+      return true;
+    }
+
+    if (rejectedTags.length > 0) {
+      return false;
+    }
+
+    _clearInputHook();
+
+    return false;
+  };
+
+  var _validateHook = function _validateHook(tagInner) {
+    return validate(tagInner) && validationRegex.test(tagInner);
+  };
+
+  var _shouldPreventDefaultEventOnAddHook = function _shouldPreventDefaultEventOnAddHook(addedInner, emptyInner, keyCodeInner) {
+    if (addedInner) {
+      return true;
+    }
+
+    if (keyCodeInner === 13) {
+      return props.preventSubmit || !props.preventSubmit && !emptyInner;
+    }
+
+    return false;
+  };
+
+  var focusHook = function focusHook() {
+    if (inputElementRef.current && typeof inputElementRef.current.focus === "function") {
+      inputElementRef.current.focus();
+    }
+
+    handleOnFocusHook();
+  };
+
+  var blurHook = function blurHook() {
+    if (inputElementRef.current && typeof inputElementRef.current.blur === "function") {
+      inputElementRef.current.blur();
+    }
+
+    handleOnBlurHook();
+  };
+
+  var acceptHook = function acceptHook() {
+    var tagInner = _tagHook();
+
+    if (tagInner !== "") {
+      tagInner = _makeTagHook(tagInner);
+      return _addTagsHook([tagInner]);
+    }
+
+    return false;
+  };
+
+  var addTagHook = function addTagHook(tagInner) {
+    return _addTagsHook([tagInner]);
+  };
+
+  var clearInputHook = function clearInputHook() {
+    _clearInputHook();
+  };
+
+  var handlePasteHook = function handlePasteHook(e) {
+    if (!addOnPaste) {
+      return;
+    }
+
+    e.preventDefault();
+    var dataInner = getClipboardData(e);
+    var tagsInner = pasteSplit(dataInner).map(function (tagInner) {
+      return _makeTagHook(tagInner);
+    });
+
+    _addTagsHook(tagsInner);
+  };
+
+  var handleKeyDownHook = function handleKeyDownHook(e) {
+    if (e.defaultPrevented) {
+      return;
+    }
+
+    var tagInner = _tagHook();
+
+    var emptyInner = tagInner === "";
+    var keyCodeInner = e.keyCode;
+    var keyInner = e.key;
+    var addInner = addKeys.indexOf(keyCodeInner) !== -1 || addKeys.indexOf(keyInner) !== -1;
+    var removeInner = removeKeys.indexOf(keyCodeInner) !== -1 || removeKeys.indexOf(keyInner) !== -1;
+
+    if (addInner) {
+      var addedInner = acceptHook();
+
+      if (_shouldPreventDefaultEventOnAddHook(addedInner, emptyInner, keyCodeInner)) {
+        e.preventDefault();
+      }
+    }
+
+    if (removeInner && value.length > 0 && emptyInner) {
+      e.preventDefault();
+
+      _removeTagHook(value.length - 1);
+    }
+  };
+
+  var handleClickHook = function handleClickHook(e) {
+    if (e.target === divElementRef.current) {
+      focusHook();
+    }
+  };
+
+  var handleChangeHook = function handleChangeHook(e) {
+    var onChange = props.inputProps.onChange;
+    var tagInner = e.target.value;
+
+    if (onChange) {
+      onChange(e);
+    }
+
+    if (hasControlledInputHook()) {
+      onChangeInput(tagInner);
+    } else {
+      setTagState(tagInner);
+    }
+  };
+
+  var handleOnFocusHook = function handleOnFocusHook(e) {
+    var onFocus = props.inputProps.onFocus;
+
+    if (onFocus) {
+      onFocus(e);
+    }
+
+    setIsFocusedState(true);
+  };
+
+  var handleOnBlurHook = function handleOnBlurHook(e) {
+    var onBlur = props.inputProps.onBlur;
+    setIsFocusedState(false);
+
+    if (e == null) {
+      return;
+    }
+
+    if (onBlur) {
+      onBlur(e);
+    }
+
+    if (addOnBlur) {
+      var tagInner = _makeTagHook(e.target.value);
+
+      _addTagsHook([tagInner]);
+    }
+  };
+
+  var handleRemoveHook = function handleRemoveHook(tagInner) {
+    _removeTagHook(tagInner);
+  };
+
+  var inputPropsHook = function inputPropsHook() {
+    // eslint-disable-next-line
+    var _props$inputProps = props.inputProps,
+        onChange = _props$inputProps.onChange,
+        onFocus = _props$inputProps.onFocus,
+        onBlur = _props$inputProps.onBlur,
+        otherInputProps = _objectWithoutProperties(_props$inputProps, ["onChange", "onFocus", "onBlur"]);
+
+    var propsInner = _objectSpread(_objectSpread({}, defaultInputProps), otherInputProps);
+
+    if (disabled) {
+      propsInner.disabled = true;
+    }
+
+    return propsInner;
+  };
+
+  var inputValueHook = function inputValueHook(propsInner) {
+    return propsInner.currentValue || propsInner.inputValue || "";
+  };
+
+  var hasControlledInputHook = function hasControlledInputHook() {
+    return typeof onChangeInput === "function" && typeof inputValue === "string";
+  };
+
+  var divClassName = className;
+
+  if (isFocusedState) {
+    divClassName = className + " " + focusedClassName;
+  }
+
+  var tagComponents = value.map(function (tag, index) {
+    return renderTag(_objectSpread({
+      key: index,
+      tag: tag,
+      onRemove: handleRemoveHook,
+      disabled: disabled,
+      getTagDisplayValue: _getTagDisplayValueHook
+    }, tagProps));
+  });
+  var inputComponent = renderInput(_objectSpread({
+    ref: inputElementRef,
+    value: _tagHook(),
+    onPaste: handlePasteHook,
+    onKeyDown: handleKeyDownHook,
+    onChange: handleChangeHook,
+    onFocus: handleOnFocusHook,
+    onBlur: handleOnBlurHook,
+    addTag: addTagHook
+  }, inputPropsHook()));
+  return /*#__PURE__*/_react["default"].createElement("div", {
+    ref: divElementRef,
+    onClick: handleClickHook,
+    className: divClassName
+  }, renderLayout(tagComponents, inputComponent));
+});
+
+TagsInput.defaultProps = {
+  className: "react-tagsinput",
+  focusedClassName: "react-tagsinput--focused",
+  addKeys: [9, 13],
+  addOnBlur: false,
+  addOnPaste: false,
+  inputProps: {},
+  removeKeys: [8],
+  renderInput: defaultRenderInput,
+  renderTag: defaultRenderTag,
+  renderLayout: defaultRenderLayout,
+  pasteSplit: defaultPasteSplit,
+  tagProps: {
+    className: "react-tagsinput-tag",
+    classNameRemove: "react-tagsinput-remove"
+  },
+  onlyUnique: false,
+  maxTags: -1,
+  validate: function validate() {
+    return true;
+  },
+  validationRegex: /.*/,
+  disabled: false,
+  tagDisplayProp: null,
+  preventSubmit: true
+};
+TagsInput.propTypes = {
+  focusedClassName: _propTypes["default"].string,
+  addKeys: _propTypes["default"].arrayOf(_propTypes["default"].oneOfType([_propTypes["default"].number, _propTypes["default"].string])),
+  addOnBlur: _propTypes["default"].bool,
+  addOnPaste: _propTypes["default"].bool,
+  currentValue: _propTypes["default"].string,
+  inputValue: _propTypes["default"].string,
+  inputProps: _propTypes["default"].object,
+  onChange: _propTypes["default"].func.isRequired,
+  onChangeInput: _propTypes["default"].func,
+  removeKeys: _propTypes["default"].arrayOf(_propTypes["default"].oneOfType([_propTypes["default"].number, _propTypes["default"].string])),
+  renderInput: _propTypes["default"].func,
+  renderTag: _propTypes["default"].func,
+  renderLayout: _propTypes["default"].func,
+  pasteSplit: _propTypes["default"].func,
+  tagProps: _propTypes["default"].object,
+  onlyUnique: _propTypes["default"].bool,
+  value: _propTypes["default"].array.isRequired,
+  maxTags: _propTypes["default"].number,
+  validate: _propTypes["default"].func,
+  validationRegex: _propTypes["default"].instanceOf(RegExp),
+  disabled: _propTypes["default"].bool,
+  tagDisplayProp: _propTypes["default"].string,
+  preventSubmit: _propTypes["default"].bool
+};
+var _default = TagsInput;
+exports["default"] = _default;
 
