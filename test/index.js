@@ -149,7 +149,7 @@ describe("TagsInput", () => {
 
     it("should focus on input when clicking on component div", () => {
       let comp = TestUtils.renderIntoDocument(<TestComponent />);
-      click(comp.tagsinput().div);
+      click(comp.div());
     });
 
     it("should not add empty tag", () => {
