@@ -13,30 +13,31 @@ global.navigator = window.navigator;
 
 class TestComponent extends React.Component {
   constructor() {
-    super()
-    this.state = {tags: []}
+    super();
+    this.state = { tags: [] };
     this.change = this.change.bind(this);
     this.input = this.input.bind(this);
     this.tagsinput = this.tagsinput.bind(this);
+    this.tagsinputRef = React.createRef();
   }
 
   input() {
-    return this.refs.tagsinput.input;
+    return this.tagsinputRef.current._getInputElementRef;
   }
 
   div() {
-    return this.refs.tagsinput.div;
+    return this.tagsinputRef.current._getDivElementRef;
   }
 
   tagsinput() {
-    return this.refs.tagsinput;
+    return this.tagsinputRef.current;
   }
 
   change(tags, changed, changedIndexes) {
     if (this.props.onChange) {
       this.props.onChange.call(this, tags, changed, changedIndexes);
     }
-    this.setState({tags});
+    this.setState({ tags });
   }
 
   len() {
@@ -48,8 +49,15 @@ class TestComponent extends React.Component {
   }
 
   render() {
-    let {onChange, ...other} = this.props;
-    return <TagsInput ref="tagsinput" value={this.state.tags} onChange={this.change} {...other} />
+    let { onChange, ...other } = this.props;
+    return (
+      <TagsInput
+        ref={this.tagsinputRef}
+        value={this.state.tags}
+        onChange={this.change}
+        {...other}
+      />
+    );
   }
 }
 
@@ -58,19 +66,19 @@ function randstring() {
 }
 
 function change(comp, value) {
-  TestUtils.Simulate.change(comp.input(), {target: {value: value}});
+  TestUtils.Simulate.change(comp.input(), { target: { value: value } });
 }
 
 function paste(comp, value) {
   TestUtils.Simulate.paste(comp.input(), {
     clipboardData: {
-      getData: () => value
-    }
+      getData: () => value,
+    },
   });
 }
 
 function keyDown(comp, code, key) {
-  TestUtils.Simulate.keyDown(comp.input(), {keyCode: code, key: key});
+  TestUtils.Simulate.keyDown(comp.input(), { keyCode: code, key: key });
 }
 
 function blur(comp) {
@@ -153,8 +161,14 @@ describe("TagsInput", () => {
     });
 
     it("should set a default value for the input", () => {
-      let comp = TestUtils.renderIntoDocument(<TestComponent currentValue="Default Value" />);
-      assert.equal(comp.input()._value, "Default Value", "there should be no tag");
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent currentValue="Default Value" />
+      );
+      assert.equal(
+        comp.input()._value,
+        "Default Value",
+        "there should be no tag"
+      );
     });
   });
 
@@ -168,7 +182,9 @@ describe("TagsInput", () => {
     });
 
     it("should add single tag", () => {
-      let comp = TestUtils.renderIntoDocument(<TestComponent addOnPaste={true} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent addOnPaste={true} />
+      );
       let tag = randstring();
 
       paste(comp, tag);
@@ -177,55 +193,85 @@ describe("TagsInput", () => {
     });
 
     it("should add two tags", () => {
-      let comp = TestUtils.renderIntoDocument(<TestComponent addOnPaste={true} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent addOnPaste={true} />
+      );
       let firstTag = randstring();
-      let secondTag = firstTag + '2';
+      let secondTag = firstTag + "2";
 
-      paste(comp, firstTag + ' ' + secondTag);
+      paste(comp, firstTag + " " + secondTag);
       assert.equal(comp.len(), 2, "there should be two tags");
-      assert.equal(comp.tag(0), firstTag, "it should be the first tag that was added");
-      assert.equal(comp.tag(1), secondTag, "it should be the second tag that was added");
+      assert.equal(
+        comp.tag(0),
+        firstTag,
+        "it should be the first tag that was added"
+      );
+      assert.equal(
+        comp.tag(1),
+        secondTag,
+        "it should be the second tag that was added"
+      );
     });
 
     it("should support onlyUnique", () => {
-      let comp = TestUtils.renderIntoDocument(<TestComponent addOnPaste={true} onlyUnique={true} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent addOnPaste={true} onlyUnique={true} />
+      );
       let tag = randstring();
 
-      paste(comp, tag + ' ' + tag);
+      paste(comp, tag + " " + tag);
       assert.equal(comp.len(), 1, "there should be one tag");
       assert.equal(comp.tag(0), tag, "it should be the tag that was added");
     });
 
     it("should support validation regex", () => {
-      let firstTag = 'aaa';
+      let firstTag = "aaa";
       let secondTag = randstring();
       let thirdTag = randstring();
 
       let fireCount = 0;
       let onValidationReject = function (tags) {
-        assert.deepEqual(tags, [secondTag, thirdTag], "there should be rejected tags in onValidationReject callback");
-        fireCount += 1
-      }
+        assert.deepEqual(
+          tags,
+          [secondTag, thirdTag],
+          "there should be rejected tags in onValidationReject callback"
+        );
+        fireCount += 1;
+      };
 
-      let comp = TestUtils.renderIntoDocument(<TestComponent addOnPaste={true} onValidationReject={onValidationReject} validationRegex={/a+/} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent
+          addOnPaste={true}
+          onValidationReject={onValidationReject}
+          validationRegex={/a+/}
+        />
+      );
 
-      paste(comp, firstTag + ' ' + secondTag + ' ' + thirdTag);
+      paste(comp, firstTag + " " + secondTag + " " + thirdTag);
       assert.equal(comp.len(), 1, "there should be one tag");
-      assert.equal(comp.tag(0), firstTag, "it should be the tag that was added");
+      assert.equal(
+        comp.tag(0),
+        firstTag,
+        "it should be the tag that was added"
+      );
       assert.equal(fireCount, 1, "onValidationReject should be fired once");
     });
 
     it("should support validation callback", () => {
-      let firstTag = '10-20';
-      let secondTag = '20-20';
-      let thirdTag = '20-10';
-      let fourthTag = '20-';
+      let firstTag = "10-20";
+      let secondTag = "20-20";
+      let thirdTag = "20-10";
+      let fourthTag = "20-";
 
       let fireCount = 0;
       let onValidationReject = function (tags) {
-        assert.deepEqual(tags, [thirdTag, fourthTag], "there should be rejected tags in onValidationReject callback");
-        fireCount += 1
-      }
+        assert.deepEqual(
+          tags,
+          [thirdTag, fourthTag],
+          "there should be rejected tags in onValidationReject callback"
+        );
+        fireCount += 1;
+      };
 
       let validate = function (tag) {
         let matches = /^(\d+)-(\d+)$/.exec(tag);
@@ -240,11 +286,20 @@ describe("TagsInput", () => {
         }
 
         return true;
-      }
+      };
 
-      let comp = TestUtils.renderIntoDocument(<TestComponent addOnPaste={true} onValidationReject={onValidationReject} validate={validate} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent
+          addOnPaste={true}
+          onValidationReject={onValidationReject}
+          validate={validate}
+        />
+      );
 
-      paste(comp, firstTag + ' ' + secondTag + ' ' + thirdTag + ' ' + fourthTag);
+      paste(
+        comp,
+        firstTag + " " + secondTag + " " + thirdTag + " " + fourthTag
+      );
       assert.equal(comp.len(), 2, "there should be two tags");
       assert.equal(comp.tag(0), firstTag, "it should allow the first tag");
       assert.equal(comp.tag(1), secondTag, "it should allow the second tag");
@@ -252,24 +307,43 @@ describe("TagsInput", () => {
     });
 
     it("should respect limit", () => {
-      let comp = TestUtils.renderIntoDocument(<TestComponent addOnPaste={true} maxTags={1} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent addOnPaste={true} maxTags={1} />
+      );
       let firstTag = randstring();
-      let secondTag = firstTag + '2';
+      let secondTag = firstTag + "2";
 
-      paste(comp, firstTag + ' ' + secondTag);
+      paste(comp, firstTag + " " + secondTag);
       assert.equal(comp.len(), 1, "there should be one tag");
-      assert.equal(comp.tag(0), firstTag, "it should be the tag that was added");
+      assert.equal(
+        comp.tag(0),
+        firstTag,
+        "it should be the tag that was added"
+      );
     });
 
     it("should split tags on ,", () => {
-      let comp = TestUtils.renderIntoDocument(<TestComponent addOnPaste={true} pasteSplit={(data) => data.split(",")} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent
+          addOnPaste={true}
+          pasteSplit={(data) => data.split(",")}
+        />
+      );
       let firstTag = randstring();
-      let secondTag = firstTag + '2';
+      let secondTag = firstTag + "2";
 
-      paste(comp, firstTag + ',' + secondTag);
+      paste(comp, firstTag + "," + secondTag);
       assert.equal(comp.len(), 2, "there should be two tags");
-      assert.equal(comp.tag(0), firstTag, "it should be the tag that was added");
-      assert.equal(comp.tag(1), secondTag, "it should be the tag that was added");
+      assert.equal(
+        comp.tag(0),
+        firstTag,
+        "it should be the tag that was added"
+      );
+      assert.equal(
+        comp.tag(1),
+        secondTag,
+        "it should be the tag that was added"
+      );
     });
   });
 
@@ -283,7 +357,9 @@ describe("TagsInput", () => {
     });
 
     it("should not add a tag twice if onlyUnique is true", () => {
-      let comp = TestUtils.renderIntoDocument(<TestComponent onlyUnique={true} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent onlyUnique={true} />
+      );
       let tag = randstring();
 
       change(comp, tag);
@@ -294,7 +370,9 @@ describe("TagsInput", () => {
     });
 
     it("should add a tag twice if onlyUnique is false", () => {
-      let comp = TestUtils.renderIntoDocument(<TestComponent onlyUnique={false} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent onlyUnique={false} />
+      );
       let tag = randstring();
 
       change(comp, tag);
@@ -315,7 +393,9 @@ describe("TagsInput", () => {
     });
 
     it("should add a tag on key `,`", () => {
-      let comp = TestUtils.renderIntoDocument(<TestComponent addKeys={[","]} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent addKeys={[","]} />
+      );
       let tag = randstring();
 
       change(comp, tag);
@@ -325,7 +405,9 @@ describe("TagsInput", () => {
     });
 
     it("should add a tag on blur, if `this.props.addOnBlur` is true", () => {
-      let comp = TestUtils.renderIntoDocument(<TestComponent addOnBlur={true} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent addOnBlur={true} />
+      );
       let tag = randstring();
 
       change(comp, tag);
@@ -336,7 +418,9 @@ describe("TagsInput", () => {
     });
 
     it("should not add a tag on blur, if `this.props.addOnBlur` is false", () => {
-      let comp = TestUtils.renderIntoDocument(<TestComponent addOnBlur={false} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent addOnBlur={false} />
+      );
       let tag = randstring();
 
       change(comp, tag);
@@ -356,7 +440,9 @@ describe("TagsInput", () => {
     });
 
     it("should remove a tag on key code 44", () => {
-      let comp = TestUtils.renderIntoDocument(<TestComponent removeKeys={[44]} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent removeKeys={[44]} />
+      );
       let tag = randstring();
 
       add(comp, tag);
@@ -366,7 +452,9 @@ describe("TagsInput", () => {
     });
 
     it("should remove a tag on key `,`", () => {
-      let comp = TestUtils.renderIntoDocument(<TestComponent removeKeys={[","]} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent removeKeys={[","]} />
+      );
       let tag = randstring();
 
       add(comp, tag);
@@ -376,27 +464,27 @@ describe("TagsInput", () => {
     });
 
     it("should be unlimited tags", () => {
-        let comp = TestUtils.renderIntoDocument(<TestComponent maxTags={-1} />);
-        let tag = randstring();
-        add(comp, tag);
-        add(comp, tag);
-        assert.equal(comp.len(), 2, "there should be 2 tags");
+      let comp = TestUtils.renderIntoDocument(<TestComponent maxTags={-1} />);
+      let tag = randstring();
+      add(comp, tag);
+      add(comp, tag);
+      assert.equal(comp.len(), 2, "there should be 2 tags");
     });
 
     it("should limit tags added to 0", () => {
-        let comp = TestUtils.renderIntoDocument(<TestComponent maxTags={0} />);
-        let tag = randstring();
-        add(comp, tag);
-        add(comp, tag);
-        assert.equal(comp.len(), 0, "there should be 0 tags");
+      let comp = TestUtils.renderIntoDocument(<TestComponent maxTags={0} />);
+      let tag = randstring();
+      add(comp, tag);
+      add(comp, tag);
+      assert.equal(comp.len(), 0, "there should be 0 tags");
     });
 
     it("should limit tags added to 1", () => {
-        let comp = TestUtils.renderIntoDocument(<TestComponent maxTags={1} />);
-        let tag = randstring();
-        add(comp, tag);
-        add(comp, tag);
-        assert.equal(comp.len(), 1, "there should be 1 tags");
+      let comp = TestUtils.renderIntoDocument(<TestComponent maxTags={1} />);
+      let tag = randstring();
+      add(comp, tag);
+      add(comp, tag);
+      assert.equal(comp.len(), 1, "there should be 1 tags");
     });
 
     it("should add a default className to host", () => {
@@ -406,7 +494,9 @@ describe("TagsInput", () => {
 
     it("should add a custom className to host", () => {
       let customClassName = "custom-class";
-      let comp = TestUtils.renderIntoDocument(<TestComponent className={customClassName} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent className={customClassName} />
+      );
       assert.equal(allClass(comp, defaultClassName).length, 0);
       assert.equal(allClass(comp, customClassName).length, 1);
     });
@@ -425,7 +515,9 @@ describe("TagsInput", () => {
     it("should add a custom className to host on focus", () => {
       let customFocusedClassName = "custom-focus";
       let className = `${defaultClassName} ${customFocusedClassName}`;
-      let comp = TestUtils.renderIntoDocument(<TestComponent focusedClassName={customFocusedClassName} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent focusedClassName={customFocusedClassName} />
+      );
 
       comp.tagsinput().focus();
       assert.equal(allClass(comp, className).length, 1, "on focus");
@@ -435,7 +527,9 @@ describe("TagsInput", () => {
     });
 
     it("should add props to tag", () => {
-      let comp = TestUtils.renderIntoDocument(<TestComponent tagProps={{className: "test"}} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent tagProps={{ className: "test" }} />
+      );
       let tag = randstring();
 
       add(comp, tag);
@@ -445,7 +539,9 @@ describe("TagsInput", () => {
     });
 
     it("should add props to input", () => {
-      let comp = TestUtils.renderIntoDocument(<TestComponent inputProps={{className: "test"}} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent inputProps={{ className: "test" }} />
+      );
       let inputs = allTag(comp, "input");
 
       assert.equal(inputs[0].className, "test", "class name should be test");
@@ -463,7 +559,9 @@ describe("TagsInput", () => {
         blurred = true;
       }
 
-      let comp = TestUtils.renderIntoDocument(<TestComponent inputProps={{onFocus: onFocus, onBlur: onBlur}}/>);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent inputProps={{ onFocus: onFocus, onBlur: onBlur }} />
+      );
 
       focus(comp);
       blur(comp);
@@ -473,13 +571,15 @@ describe("TagsInput", () => {
     });
 
     it("should fire onChange on input", (done) => {
-      let tag = randstring()
+      let tag = randstring();
       let onChange = (e) => {
         assert.equal(tag, e.target.value, "input tag should be equal");
         done();
-      }
+      };
 
-      let comp = TestUtils.renderIntoDocument(<TestComponent inputProps={{onChange: onChange}} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent inputProps={{ onChange: onChange }} />
+      );
       let inputs = allTag(comp, "input");
 
       change(comp, tag);
@@ -490,7 +590,9 @@ describe("TagsInput", () => {
         return <div key={props.key} className="test"></div>;
       };
 
-      let comp = TestUtils.renderIntoDocument(<TestComponent renderTag={renderTag} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent renderTag={renderTag} />
+      );
       let tag = randstring();
 
       add(comp, tag);
@@ -500,52 +602,67 @@ describe("TagsInput", () => {
     });
 
     it("should use tagDisplayProp to deal with objects", () => {
-      let comp = TestUtils.renderIntoDocument(<TestComponent tagDisplayProp={'name'} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent tagDisplayProp={"name"} />
+      );
 
-      add(comp, 'foo');
+      add(comp, "foo");
       assert.equal(comp.len(), 1, "there should be one tag");
-      assert.deepEqual(comp.tag(0), {name:'foo'}, "should be {name: 'foo'}");
+      assert.deepEqual(comp.tag(0), { name: "foo" }, "should be {name: 'foo'}");
     });
 
     it("should render input with renderInput", () => {
       let renderInput = (props) => {
         return <input key={props.key} className="test" />;
       };
-      let comp = TestUtils.renderIntoDocument(<TestComponent renderInput={renderInput} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent renderInput={renderInput} />
+      );
       let inputs = allTag(comp, "input");
 
       assert.equal(inputs[0].className, "test", "class name should be test");
     });
 
     it("should accept tags only matching validationRegex", () => {
-      let comp = TestUtils.renderIntoDocument(<TestComponent validationRegex={/a+/} />);
-      add(comp, 'b');
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent validationRegex={/a+/} />
+      );
+      add(comp, "b");
       assert.equal(comp.len(), 0, "there should be no tags");
-      add(comp, 'a');
+      add(comp, "a");
       assert.equal(comp.len(), 1, "there should be one tag");
     });
 
     it("should fire onValidationReject when tag is rejected through validation", () => {
       let fireCount = 0;
       let onValidationReject = function (tags) {
-        assert.deepEqual(tags, ['b']);
-        fireCount += 1
-      }
-      let comp = TestUtils.renderIntoDocument(<TestComponent validationRegex={/a+/} onValidationReject={onValidationReject} />);
-      add(comp, 'b');
-      add(comp, 'a');
-      assert.equal(fireCount, 1)
-    })
+        assert.deepEqual(tags, ["b"]);
+        fireCount += 1;
+      };
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent
+          validationRegex={/a+/}
+          onValidationReject={onValidationReject}
+        />
+      );
+      add(comp, "b");
+      add(comp, "a");
+      assert.equal(fireCount, 1);
+    });
 
     it("should add pass changed value to onChange", () => {
       let onChange = function (tags, changed, changedIndexes) {
         let oldTags = this.state.tags;
         if (oldTags.length < tags.length) {
-          let newTags = oldTags.concat(changed)
-          assert.deepEqual(newTags, tags, "the old tags plus changed should be the new tags");
+          let newTags = oldTags.concat(changed);
+          assert.deepEqual(
+            newTags,
+            tags,
+            "the old tags plus changed should be the new tags"
+          );
           changedIndexes.forEach((i) => {
-            assert.equal(newTags[i], changed[i - oldTags.length])
-          })
+            assert.equal(newTags[i], changed[i - oldTags.length]);
+          });
         } else {
           let indexes = [];
           let newTags = oldTags.filter((t, i) => {
@@ -555,82 +672,123 @@ describe("TagsInput", () => {
             }
             return notRemoved;
           });
-          assert.deepEqual(indexes, changedIndexes, "indexes should be the same");
-          assert.deepEqual(newTags, tags, "the old tags minus changed should be the new tags");
+          assert.deepEqual(
+            indexes,
+            changedIndexes,
+            "indexes should be the same"
+          );
+          assert.deepEqual(
+            newTags,
+            tags,
+            "the old tags minus changed should be the new tags"
+          );
         }
-      }
+      };
 
-      let comp = TestUtils.renderIntoDocument(<TestComponent addOnPaste={true} onChange={onChange} />);
-      add(comp, 'a');
-      add(comp, 'b');
-      add(comp, 'c');
-      paste(comp, 'd e f');
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent addOnPaste={true} onChange={onChange} />
+      );
+      add(comp, "a");
+      add(comp, "b");
+      add(comp, "c");
+      paste(comp, "d e f");
       remove(comp);
       remove(comp);
       remove(comp);
     });
 
-
     it("should disable input when component is disabled", () => {
-      let comp = TestUtils.renderIntoDocument(<TestComponent disabled={true} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent disabled={true} />
+      );
       assert.ok(comp.tagsinput().input.disabled, "input should be disabled");
     });
 
-    describe('preventSubmit', () => {
-
+    describe("preventSubmit", () => {
       function addTagWithEventSpy(comp, tag, preventDefaultSpy) {
         change(comp, tag);
-        TestUtils.Simulate.keyDown(comp.input(), { keyCode: 13, preventDefault: preventDefaultSpy });
+        TestUtils.Simulate.keyDown(comp.input(), {
+          keyCode: 13,
+          preventDefault: preventDefaultSpy,
+        });
       }
 
       describe("when to to true", () => {
         it("should prevent default submit event on enter key when adding a tag ", () => {
-          let comp = TestUtils.renderIntoDocument(<TestComponent preventSubmit={true} />);
+          let comp = TestUtils.renderIntoDocument(
+            <TestComponent preventSubmit={true} />
+          );
           const preventDefault = sinon.spy();
 
           addTagWithEventSpy(comp, "Tag", preventDefault);
-          assert.equal(preventDefault.called, true, "preventDefault was not called when it should be");
+          assert.equal(
+            preventDefault.called,
+            true,
+            "preventDefault was not called when it should be"
+          );
         });
 
         it("should prevent default submit on enter key when tag is empty when prop is true", () => {
-          let comp = TestUtils.renderIntoDocument(<TestComponent preventSubmit={true} />);
+          let comp = TestUtils.renderIntoDocument(
+            <TestComponent preventSubmit={true} />
+          );
           const preventDefault = sinon.spy();
 
           addTagWithEventSpy(comp, "", preventDefault);
-          assert.equal(preventDefault.called, true, "preventDefault was not called when it should be");
+          assert.equal(
+            preventDefault.called,
+            true,
+            "preventDefault was not called when it should be"
+          );
         });
-
       });
 
       describe("when set to false", () => {
         it("should not prevent default submit on enter key when tag is empty", () => {
-          let comp = TestUtils.renderIntoDocument(<TestComponent preventSubmit={false} />);
+          let comp = TestUtils.renderIntoDocument(
+            <TestComponent preventSubmit={false} />
+          );
           const preventDefault = sinon.spy();
 
           addTagWithEventSpy(comp, "", preventDefault);
-          assert.equal(preventDefault.called, false, "preventDefault was called when it should not be");
+          assert.equal(
+            preventDefault.called,
+            false,
+            "preventDefault was called when it should not be"
+          );
         });
 
         it("should still prevent default submit on enter key when tag is not empty and added", () => {
-          let comp = TestUtils.renderIntoDocument(<TestComponent preventSubmit={false} />);
+          let comp = TestUtils.renderIntoDocument(
+            <TestComponent preventSubmit={false} />
+          );
           const preventDefault = sinon.spy();
 
           addTagWithEventSpy(comp, "A tag", preventDefault);
-          assert.equal(preventDefault.called, true, "preventDefault was not called when it should have been");
+          assert.equal(
+            preventDefault.called,
+            true,
+            "preventDefault was not called when it should have been"
+          );
         });
 
         it("should still prevent default submit event if a tag is rejected (unique etc..)", () => {
-          let comp = TestUtils.renderIntoDocument(<TestComponent preventSubmit={false} onlyUnique={true} />);
+          let comp = TestUtils.renderIntoDocument(
+            <TestComponent preventSubmit={false} onlyUnique={true} />
+          );
           const preventDefault = sinon.spy();
 
           add(comp, "Tag", 13);
           addTagWithEventSpy(comp, "Tag", preventDefault);
 
-          assert.equal(preventDefault.called, true, "preventDefault was not called when it should have been");
+          assert.equal(
+            preventDefault.called,
+            true,
+            "preventDefault was not called when it should have been"
+          );
         });
       });
     });
-
   });
 
   describe("methods", () => {
@@ -651,56 +809,79 @@ describe("TagsInput", () => {
 
       change(comp, "test");
       comp.tagsinput().clearInput();
-      assert.equal(comp.tagsinput().state.tag, '', "there should be no tag value")
+      assert.equal(
+        comp.tagsinput().state.tag,
+        "",
+        "there should be no tag value"
+      );
     });
 
     it("should add a tag with addTag", () => {
       let comp = TestUtils.renderIntoDocument(<TestComponent />);
 
       comp.tagsinput().addTag("test");
-      assert.equal(comp.len(), 1, "there should be one tag")
+      assert.equal(comp.len(), 1, "there should be one tag");
     });
 
     describe("componentWillReceiveProps", () => {
       it("updates the state", () => {
         class TestParent extends React.Component {
           constructor() {
-            super()
-            this.state = {currentValue: "init"};
+            super();
+            this.state = { currentValue: "init" };
           }
 
           render() {
-            return <TestComponent ref="testComp" currentValue={this.state.currentValue} />
+            return (
+              <TestComponent
+                ref="testComp"
+                currentValue={this.state.currentValue}
+              />
+            );
           }
         }
 
         let parent = TestUtils.renderIntoDocument(<TestParent />);
         parent.setState({
-          currentValue: "test"
+          currentValue: "test",
         });
 
-        assert.equal(parent.refs.testComp.props.currentValue, "test", "sets the correct value for currentValue")
-      })
+        assert.equal(
+          parent.refs.testComp.props.currentValue,
+          "test",
+          "sets the correct value for currentValue"
+        );
+      });
 
       it("does not modify the state", () => {
         class TestParent extends React.Component {
           constructor() {
-            super()
-            this.state = {currentValue: "init", fake: "fake"};
+            super();
+            this.state = { currentValue: "init", fake: "fake" };
           }
 
           render() {
-            return <TestComponent ref="testComp" fake={this.state.fake} currentValue={this.state.currentValue} />
+            return (
+              <TestComponent
+                ref="testComp"
+                fake={this.state.fake}
+                currentValue={this.state.currentValue}
+              />
+            );
           }
         }
 
         let parent = TestUtils.renderIntoDocument(<TestParent />);
         parent.setState({
-          fake: "test"
+          fake: "test",
         });
 
-        assert.equal(parent.refs.testComp.props.currentValue, "init", "does not modify currentValue")
-      })
+        assert.equal(
+          parent.refs.testComp.props.currentValue,
+          "init",
+          "does not modify currentValue"
+        );
+      });
     });
   });
 
@@ -712,51 +893,59 @@ describe("TagsInput", () => {
     });
 
     it("should test prevent default", () => {
-      let comp = TestUtils.renderIntoDocument(<TestComponent onlyUnique={true} value={["test"]} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent onlyUnique={true} value={["test"]} />
+      );
 
       add(comp, "test", 9);
     });
 
     it("should do nothing if default is prevented on input", () => {
-      function renderInput (props) {
-        let {onChange, value, addTag, onKeyDown, ...other} = props
+      function renderInput(props) {
+        let { onChange, value, addTag, onKeyDown, ...other } = props;
         let keyDown = (e) => {
-          e.preventDefault()
-          onKeyDown(e)
-        }
+          e.preventDefault();
+          onKeyDown(e);
+        };
 
         return (
-          <input type='text' onChange={onChange} value={value} onKeyDown={keyDown} {...other} />
-        )
+          <input
+            type="text"
+            onChange={onChange}
+            value={value}
+            onKeyDown={keyDown}
+            {...other}
+          />
+        );
       }
 
-      let comp = TestUtils.renderIntoDocument(<TestComponent renderInput={renderInput} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent renderInput={renderInput} />
+      );
 
       add(comp, "test", 13);
     });
 
     it("should not focus on an input that does not have focus method", () => {
       class Empty extends React.Component {
-        render () {
-          return (
-            <span>
-              {this.props.children}
-            </span>
-          );
+        render() {
+          return <span>{this.props.children}</span>;
         }
       }
 
-      function renderInput (props) {
-        let {onChange, value, addTag, ref, ...other} = props
+      function renderInput(props) {
+        let { onChange, value, addTag, ref, ...other } = props;
 
         return (
           <Empty ref={ref}>
-            <input type='text' onChange={onChange} value={value} {...other} />
+            <input type="text" onChange={onChange} value={value} {...other} />
           </Empty>
-        )
+        );
       }
 
-      let comp = TestUtils.renderIntoDocument(<TestComponent renderInput={renderInput} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent renderInput={renderInput} />
+      );
 
       comp.tagsinput().blur();
       comp.tagsinput().focus();
@@ -765,9 +954,11 @@ describe("TagsInput", () => {
 
   describe("controlled", () => {
     it("should control input", () => {
-      let comp = TestUtils.renderIntoDocument(<TestComponent inputValue="" onChangeInput={() => {}} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent inputValue="" onChangeInput={() => {}} />
+      );
 
-      add(comp, '');
+      add(comp, "");
       assert.equal(comp.len(), 0, "there should be no tags");
       comp.tagsinput()._clearInput();
     });
@@ -777,26 +968,40 @@ describe("TagsInput", () => {
     it("should not add empty tags", () => {
       let comp = TestUtils.renderIntoDocument(<TestComponent />);
 
-      add(comp, '');
+      add(comp, "");
       assert.equal(comp.len(), 0, "there should be no tags");
     });
 
     it("should not override default input props", () => {
-      let comp = TestUtils.renderIntoDocument(<TestComponent inputProps={{placeholder: "test"}}/>);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent inputProps={{ placeholder: "test" }} />
+      );
 
-      assert.equal(comp.tagsinput().inputProps().className, "react-tagsinput-input", "should have the default className");
+      assert.equal(
+        comp.tagsinput().inputProps().className,
+        "react-tagsinput-input",
+        "should have the default className"
+      );
     });
 
     it("should override default input props", () => {
-      let comp = TestUtils.renderIntoDocument(<TestComponent inputProps={{className: "test"}}/>);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent inputProps={{ className: "test" }} />
+      );
 
-      assert.equal(comp.tagsinput().inputProps().className, "test", "should not have the default className");
+      assert.equal(
+        comp.tagsinput().inputProps().className,
+        "test",
+        "should not have the default className"
+      );
     });
 
     it("should be able to add objects to tags", () => {
-      let comp = TestUtils.renderIntoDocument(<TestComponent renderTag={({key}) => <span key={key} />} />);
+      let comp = TestUtils.renderIntoDocument(
+        <TestComponent renderTag={({ key }) => <span key={key} />} />
+      );
 
-      comp.tagsinput().addTag({name: "test"});
+      comp.tagsinput().addTag({ name: "test" });
     });
   });
 });
