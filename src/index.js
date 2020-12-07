@@ -84,7 +84,7 @@ const defaultInputProps = {
 };
 
 const TagsInput = React.forwardRef((props, ref) => {
-  const divElementRef = ref ? ref:React.useRef(null);
+  const divElementRef = React.useRef(null);
   const inputElementRef = React.useRef(null);
   const [tagState, setTagState] = React.useState("");
   const [isFocusedState, setIsFocusedState] = React.useState(false);
@@ -434,7 +434,107 @@ const TagsInput = React.forwardRef((props, ref) => {
     addTag: addTagHook,
     ...inputPropsHook(),
   });
+  React.useImperativeHandle(ref, () => ({
+    _getDivElementRef: divElementRef.current,
+    _getInputElementRef: inputElementRef.current,
+    props: props,
 
+    _getTagDisplayValue: (tagInner) => {
+      return _getTagDisplayValueHook(tagInner);
+    },
+
+    _makeTag: (tagInner) => {
+      return _makeTagHook(tagInner);
+    },
+
+    _removeTag: (indexInner) => {
+      _removeTagHook(indexInner);
+    },
+
+    _clearInput: () => {
+      _clearInputHook();
+    },
+
+    _tag: () => {
+      return _tagHook();
+    },
+
+    _addTags: (tagsInner) => {
+      return _addTagsHook(tagsInner);
+    },
+
+    _validate: (tagInner) => {
+      return _validateHook(tagInner);
+    },
+
+    _shouldPreventDefaultEventOnAdd: (addedInner, emptyInner, keyCodeInner) => {
+      return _shouldPreventDefaultEventOnAddHook(
+        addedInner,
+        emptyInner,
+        keyCodeInner
+      );
+    },
+
+    focus: () => {
+      focusHook();
+    },
+
+    blur: () => {
+      blurHook();
+    },
+
+    accept: () => {
+      return acceptHook();
+    },
+
+    addTag: (tagInner) => {
+      return addTagHook(tagInner);
+    },
+
+    clearInput: () => {
+      clearInputHook();
+    },
+
+    handlePaste: (e) => {
+      handlePasteHook(e);
+    },
+
+    handleKeyDown: (e) => {
+      handleKeyDownHook(e);
+    },
+
+    handleClick: (e) => {
+      handleClickHook(e);
+    },
+
+    handleChange: (e) => {
+      handleChangeHook(e);
+    },
+
+    handleOnFocus: (e) => {
+      handleOnFocusHook(e);
+    },
+
+    handleOnBlur: (e) => {
+      handleOnBlurHook(e);
+    },
+
+    handleRemove: (tagInner) => {
+      handleRemoveHook(tagInner);
+    },
+
+    inputProps: () => {
+      return inputPropsHook();
+    },
+
+    inputValue: (propsInner) => {
+      return inputValueHook(propsInner);
+    },
+
+    hasControlledInput: () => {
+      return hasControlledInputHook();
+    },
+  }));
   return (
     <div ref={divElementRef} onClick={handleClickHook} className={divClassName}>
       {renderLayout(tagComponents, inputComponent)}
