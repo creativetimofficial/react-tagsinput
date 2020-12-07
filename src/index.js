@@ -438,6 +438,7 @@ const TagsInput = React.forwardRef((props, ref) => {
     _getDivElementRef: divElementRef.current,
     _getInputElementRef: inputElementRef.current,
     props: props,
+    _getTagState: tagState,
 
     _getTagDisplayValue: (tagInner) => {
       return _getTagDisplayValueHook(tagInner);
