@@ -1,16 +1,15 @@
+import TagsInput from "../src";
+import React from "react";
+import TestUtils from "react-dom/test-utils";
+import assert from "assert";
+import sinon from "sinon";
+
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 const dom = new JSDOM("");
 global.document = dom.window.document;
 global.window = document.defaultView;
 global.navigator = window.navigator;
-
-const TagsInput = require("../src");
-
-const React = require("react");
-const TestUtils = require("react-dom/test-utils");
-const assert = require("assert");
-const sinon = require('sinon');
 
 class TestComponent extends React.Component {
   constructor() {
